@@ -184,22 +184,22 @@
                 });
         }
 
-        // BUKA MODAL REVIEW (ACC/TOLAK)
-        function bukaModalReview(id, target, judul, bukti) {
+        // BUKA MODAL REVIEW (ACC/TOLAK) - Di-decode dulu biar aman
+        function bukaModalReview(id, target, encJudul, encBukti) {
             document.getElementById('reviewQuestId').value = id;
             document.getElementById('reviewTarget').innerHTML = `<i class="fa-solid fa-user text-[10px]"></i> @${target}`;
-            document.getElementById('reviewJudul').innerText = judul;
-            document.getElementById('reviewBukti').innerText = bukti || "Tidak ada catatan terlampir.";
+            document.getElementById('reviewJudul').innerText = decodeURIComponent(encJudul);
+            document.getElementById('reviewBukti').innerText = decodeURIComponent(encBukti);
             document.getElementById('reviewAlasan').value = '';
             
             document.getElementById('modalReview').classList.remove('hidden');
         }
 
-        // BUKA MODAL CEK BUKTI (HANYA BACA)
-        function bukaModalCekBukti(target, judul, bukti) {
+        // BUKA MODAL CEK BUKTI (HANYA BACA) - Di-decode dulu biar aman
+        function bukaModalCekBukti(target, encJudul, encBukti) {
             document.getElementById('cekBuktiTarget').innerHTML = `<i class="fa-solid fa-user text-[10px]"></i> @${target}`;
-            document.getElementById('cekBuktiJudul').innerText = judul;
-            document.getElementById('cekBuktiIsi').innerText = bukti || "Tidak ada catatan terlampir.";
+            document.getElementById('cekBuktiJudul').innerText = decodeURIComponent(encJudul);
+            document.getElementById('cekBuktiIsi').innerText = decodeURIComponent(encBukti);
             
             document.getElementById('modalCekBukti').classList.remove('hidden');
         }
@@ -268,17 +268,18 @@
                             let statBadge = '';
                             let actionHtml = '';
 
-                            let safeJudul = q.judul.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                            let safeBukti = (q.bukti_creator || "Tidak ada catatan terlampir.").replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                            // === SOLUSI AMPUH: ENCODE DATA ===
+                            // Data dibungkus jadi kode URI biar nggak ada error enter/kutip sama sekali
+                            let encodedJudul = encodeURIComponent(q.judul || "");
+                            let encodedBukti = encodeURIComponent(q.bukti_creator || "Tidak ada catatan terlampir.");
 
                             if(q.status === 'Under Review') {
                                 cardBorder = 'border-amber-300 bg-amber-50/30';
                                 statBadge = `<span class="inline-block mt-2 text-[10px] font-bold px-2 py-1 rounded-md bg-amber-100 text-amber-600"><i class="fa-solid fa-bell fa-shake mr-1"></i> BUTUH REVIEW</span>`;
-                                actionHtml = `<button onclick="bukaModalReview('${q.id}', '${q.target}', '${safeJudul}', '${safeBukti}')" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white py-2 px-5 rounded-lg text-sm font-bold shadow-md transition active:scale-95"><i class="fa-solid fa-eye mr-1"></i> Review Laporan</button>`;
+                                actionHtml = `<button onclick="bukaModalReview('${q.id}', '${q.target}', '${encodedJudul}', '${encodedBukti}')" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white py-2 px-5 rounded-lg text-sm font-bold shadow-md transition active:scale-95"><i class="fa-solid fa-eye mr-1"></i> Review Laporan</button>`;
                             } else if(q.status === 'Selesai') {
                                 statBadge = `<span class="inline-block mt-2 text-[10px] font-bold px-2 py-1 rounded-md bg-emerald-100 text-emerald-600"><i class="fa-solid fa-check mr-1"></i> SELESAI ACC</span>`;
-                                // REVISI: Tombol Cek Bukti sekarang manggil Pop-Up Modal
-                                actionHtml = `<button onclick="bukaModalCekBukti('${q.target}', '${safeJudul}', '${safeBukti}')" class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 px-5 rounded-lg text-sm font-bold shadow-sm border border-slate-200 transition active:scale-95"><i class="fa-solid fa-magnifying-glass mr-1"></i> Cek Bukti</button>`;
+                                actionHtml = `<button onclick="bukaModalCekBukti('${q.target}', '${encodedJudul}', '${encodedBukti}')" class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 px-5 rounded-lg text-sm font-bold shadow-sm border border-slate-200 transition active:scale-95"><i class="fa-solid fa-magnifying-glass mr-1"></i> Cek Bukti</button>`;
                             } else if(q.status === 'Ditolak') {
                                 statBadge = `<span class="inline-block mt-2 text-[10px] font-bold px-2 py-1 rounded-md bg-rose-100 text-rose-600"><i class="fa-solid fa-xmark mr-1"></i> REVISI</span>`;
                             } else {
@@ -345,3 +346,4 @@
     </script>
 </body>
 </html>
+
