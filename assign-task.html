@@ -93,7 +93,7 @@
 
     <div id="modalReview" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4 transition-opacity">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all border-t-4 border-amber-400">
-            <div class="p-5 border-b border-slate-100 flex justify-between items-center">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <h3 class="font-black text-slate-800 text-lg flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-amber-500"></i> Review Laporan</h3>
                 <button onclick="tutupModalReview()" class="text-slate-400 hover:text-slate-700 transition"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
@@ -108,7 +108,7 @@
 
                 <div class="mb-6">
                     <p class="text-xs font-bold text-slate-400 uppercase mb-1">Bukti Laporan / Catatan Kreator</p>
-                    <div id="reviewBukti" class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm text-slate-700 break-words whitespace-pre-wrap"></div>
+                    <div id="reviewBukti" class="bg-slate-100 p-4 rounded-xl border border-slate-200 text-sm text-slate-700 break-words whitespace-pre-wrap font-medium"></div>
                 </div>
 
                 <div class="mb-6" id="wrapAlasanTolak" style="display:none;">
@@ -128,6 +128,29 @@
         </div>
     </div>
 
+    <div id="modalCekBukti" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all border-t-4 border-emerald-400">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-black text-slate-800 text-lg flex items-center gap-2"><i class="fa-solid fa-magnifying-glass text-emerald-500"></i> Detail Laporan</h3>
+                <button onclick="tutupModalCekBukti()" class="text-slate-400 hover:text-slate-700 transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <div class="mb-4">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Kreator & Quest</p>
+                    <p id="cekBuktiTarget" class="font-bold text-blue-600 text-sm mb-0.5"></p>
+                    <p id="cekBuktiJudul" class="font-bold text-slate-800"></p>
+                </div>
+
+                <div class="mb-6">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Catatan Tersimpan</p>
+                    <div id="cekBuktiIsi" class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-sm text-slate-700 break-words whitespace-pre-wrap font-medium"></div>
+                </div>
+
+                <button onclick="tutupModalCekBukti()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition active:scale-95">TUTUP</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbzCaM4GScQqpluS2TGRizNVCMgcjWLrlz_4QDIPWC056RyGbx6DunE9fQetbbZIj2bt/exec';
 
@@ -138,9 +161,14 @@
         }
 
         function toggleModal() { document.getElementById('modalQuest').classList.toggle('hidden'); }
+        
         function tutupModalReview() { 
             document.getElementById('modalReview').classList.add('hidden'); 
-            document.getElementById('wrapAlasanTolak').style.display = 'none'; // Reset kotak tolak
+            document.getElementById('wrapAlasanTolak').style.display = 'none'; 
+        }
+
+        function tutupModalCekBukti() {
+            document.getElementById('modalCekBukti').classList.add('hidden');
         }
 
         function fetchCreators() {
@@ -156,7 +184,7 @@
                 });
         }
 
-        // BUKA MODAL REVIEW KALO BOS MAU CEK LAPORAN
+        // BUKA MODAL REVIEW (ACC/TOLAK)
         function bukaModalReview(id, target, judul, bukti) {
             document.getElementById('reviewQuestId').value = id;
             document.getElementById('reviewTarget').innerHTML = `<i class="fa-solid fa-user text-[10px]"></i> @${target}`;
@@ -167,7 +195,16 @@
             document.getElementById('modalReview').classList.remove('hidden');
         }
 
-        // PROSES SUBMIT REVIEW (ACC ATAU TOLAK)
+        // BUKA MODAL CEK BUKTI (HANYA BACA)
+        function bukaModalCekBukti(target, judul, bukti) {
+            document.getElementById('cekBuktiTarget').innerHTML = `<i class="fa-solid fa-user text-[10px]"></i> @${target}`;
+            document.getElementById('cekBuktiJudul').innerText = judul;
+            document.getElementById('cekBuktiIsi').innerText = bukti || "Tidak ada catatan terlampir.";
+            
+            document.getElementById('modalCekBukti').classList.remove('hidden');
+        }
+
+        // PROSES SUBMIT REVIEW
         function submitReview(keputusan) {
             const idQuest = document.getElementById('reviewQuestId').value;
             let noteAdmin = "";
@@ -175,10 +212,9 @@
             if (keputusan === 'Ditolak') {
                 noteAdmin = document.getElementById('reviewAlasan').value;
                 if (!noteAdmin) {
-                    // Kalo blm ngisi alasan, keluarin kotaknya
                     document.getElementById('wrapAlasanTolak').style.display = 'block';
                     document.getElementById('reviewAlasan').focus();
-                    return; // Stop dulu sampai bos ngisi alasan
+                    return; 
                 }
             }
 
@@ -228,13 +264,12 @@
                             let isMain = q.tipe.includes('Main');
                             let icon = isMain ? '<i class="fa-solid fa-calendar-day"></i>' : '<i class="fa-solid fa-briefcase"></i>';
                             
-                            // UI WARNA CARD BERDASARKAN STATUS
                             let cardBorder = 'border-slate-200';
                             let statBadge = '';
                             let actionHtml = '';
 
                             let safeJudul = q.judul.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                            let safeBukti = (q.bukti_creator || "").replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                            let safeBukti = (q.bukti_creator || "Tidak ada catatan terlampir.").replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
                             if(q.status === 'Under Review') {
                                 cardBorder = 'border-amber-300 bg-amber-50/30';
@@ -242,13 +277,14 @@
                                 actionHtml = `<button onclick="bukaModalReview('${q.id}', '${q.target}', '${safeJudul}', '${safeBukti}')" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white py-2 px-5 rounded-lg text-sm font-bold shadow-md transition active:scale-95"><i class="fa-solid fa-eye mr-1"></i> Review Laporan</button>`;
                             } else if(q.status === 'Selesai') {
                                 statBadge = `<span class="inline-block mt-2 text-[10px] font-bold px-2 py-1 rounded-md bg-emerald-100 text-emerald-600"><i class="fa-solid fa-check mr-1"></i> SELESAI ACC</span>`;
+                                // REVISI: Tombol Cek Bukti sekarang manggil Pop-Up Modal
+                                actionHtml = `<button onclick="bukaModalCekBukti('${q.target}', '${safeJudul}', '${safeBukti}')" class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 px-5 rounded-lg text-sm font-bold shadow-sm border border-slate-200 transition active:scale-95"><i class="fa-solid fa-magnifying-glass mr-1"></i> Cek Bukti</button>`;
                             } else if(q.status === 'Ditolak') {
                                 statBadge = `<span class="inline-block mt-2 text-[10px] font-bold px-2 py-1 rounded-md bg-rose-100 text-rose-600"><i class="fa-solid fa-xmark mr-1"></i> REVISI</span>`;
                             } else {
                                 statBadge = `<span class="inline-block mt-2 text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100 text-slate-500">PENDING</span>`;
                             }
 
-                            // Tombol Hapus nempel terus
                             let btnHapus = `<button onclick="hapusQuest('${q.id}')" class="text-rose-400 hover:text-rose-600 p-2 rounded-lg transition" title="Hapus"><i class="fa-solid fa-trash"></i></button>`;
 
                             let html = `
