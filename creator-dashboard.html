@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator Dashboard - YTQuest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .bg-animate { background-size: 200% 200%; animation: gradientMove 5s ease infinite; }
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans antialiased text-slate-800 flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-slate-900 text-white flex-col hidden md:flex h-full shrink-0 z-50 shadow-2xl">
+        <div class="p-6 flex items-center border-b border-slate-700">
+            <i class="fa-solid fa-gamepad text-2xl text-blue-400 mr-2"></i>
+            <h1 class="text-xl font-bold tracking-wider">YT<span class="text-blue-400">QUEST</span></h1>
+        </div>
+        
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+            <a href="creator-dashboard.html" class="flex items-center p-3 bg-blue-600 rounded-lg text-white font-medium shadow-md">
+                <i class="fa-solid fa-house w-6"></i> Home / Quest
+            </a>
+            <a href="channels.html" class="flex items-center p-3 hover:bg-slate-800 rounded-lg transition-colors text-slate-300 hover:text-white">
+                <i class="fa-brands fa-youtube w-6"></i> Database Channel
+            </a>
+            <a href="regis-youtube.html" class="flex items-center p-3 hover:bg-slate-800 rounded-lg transition-colors text-slate-300 hover:text-white">
+                <i class="fa-solid fa-user-plus w-6"></i> Regis Speedrun
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-slate-700 bg-slate-800/50">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-400 to-emerald-600 flex items-center justify-center text-sm font-bold mr-3 border-2 border-slate-700">CR</div>
+                    <div>
+                        <p class="text-sm font-bold text-white display-username">@kreator</p>
+                        <p class="text-[10px] text-emerald-400"><i class="fa-solid fa-circle text-[8px]"></i> Online</p>
+                    </div>
+                </div>
+                <button onclick="logoutApp()" class="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white flex items-center justify-center transition active:scale-95" title="Logout">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col h-screen overflow-y-auto relative w-full pb-20 md:pb-0">
+
+        <header class="bg-gradient-to-r from-indigo-900 via-blue-800 to-indigo-900 bg-animate shadow-lg relative z-10 shrink-0">
+            <div class="px-6 py-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-5 w-full md:w-auto">
+                    <div class="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-black text-2xl border-2 border-blue-300 shadow-lg">
+                        <i class="fa-solid fa-user-ninja"></i>
+                    </div>
+                    <div>
+                        <p class="text-blue-200 text-xs font-bold tracking-widest uppercase mb-1">Creator Team</p>
+                        <h1 class="text-3xl font-black text-white display-username">@kreator</h1>
+                    </div>
+                </div>
+
+                <div class="bg-indigo-950/50 p-4 rounded-xl border border-white/10 backdrop-blur-md w-full md:w-auto md:min-w-[240px] shadow-inner flex items-center justify-between gap-4">
+                    <div>
+                        <p class="text-blue-200 text-[10px] font-bold tracking-widest uppercase mb-0.5">Total Regis Akumulatif</p>
+                        <p class="text-2xl font-black text-amber-400">
+                            <span id="totalRegisCreator"><i class="fa-solid fa-circle-notch fa-spin text-sm"></i></span> 
+                            <span class="text-sm font-medium text-blue-200">Akun</span>
+                        </p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-400 text-lg shadow-sm border border-amber-400/30">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="px-4 md:px-8 py-8 flex-1">
+            <div class="bg-amber-100 border border-amber-300 text-amber-800 px-5 py-4 rounded-xl shadow-sm flex items-center gap-4 mb-8">
+                <div class="bg-amber-500 text-white w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-md shrink-0"><i class="fa-solid fa-bell animate-bounce"></i></div>
+                <div>
+                    <h4 class="font-bold text-base">Grinding Time!</h4>
+                    <p class="text-sm mt-0.5">Selesaikan quest dan lampirkan buktinya biar bisa di-Review.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                <div class="xl:col-span-2">
+                    <h2 class="text-xl font-black text-slate-800 mb-4 flex items-center justify-between border-b border-slate-200 pb-2">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-calendar-day text-blue-500 text-2xl"></i>Daftar Quest</span>
+                        <button onclick="loadCreatorQuests()" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+                    </h2>
+                    
+                    <div id="questListContainer" class="space-y-4">
+                        <div class="text-center py-10 text-slate-400">
+                            <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2 text-blue-500"></i>
+                            <p>Mengambil tugas dari server...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <h2 class="text-xl font-black text-slate-800 mb-4 flex items-center gap-2 border-b border-slate-200 pb-2">
+                        <i class="fa-solid fa-medal text-amber-500 text-2xl"></i> Info Kerja
+                    </h2>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <p class="text-sm text-slate-500 leading-relaxed mb-3">Tugas yang lu laporin bakal masuk status <b class="text-amber-500">Under Review</b>.</p>
+                        <p class="text-sm text-slate-500 leading-relaxed">Kalau kerjaan lu ga di acc, statusnya bakal berubah <b class="text-rose-500">Ditolak</b> beserta catatannya biar lu bisa revisi.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-3 pb-safe shadow-[0_-5px_15px_-5px_rgba(0,0,0,0.1)] z-40 md:hidden">
+        <a href="creator-dashboard.html" class="flex flex-col items-center text-blue-600 transition">
+            <i class="fa-solid fa-house text-xl mb-1"></i><span class="text-[10px] font-bold">Home</span>
+        </a>
+        <a href="channels.html" class="flex flex-col items-center text-slate-400 hover:text-blue-500 transition">
+            <i class="fa-brands fa-youtube text-xl mb-1"></i><span class="text-[10px] font-bold">Channel</span>
+        </a>
+        <a href="regis-youtube.html" class="flex flex-col items-center -mt-6 relative group">
+            <div class="w-14 h-14 bg-gradient-to-tr from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white text-2xl shadow-lg border-4 border-white active:scale-95 transition transform">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+            <span class="text-[10px] font-bold text-slate-600 mt-1">Regis</span>
+        </a>
+        <button onclick="logoutApp()" class="flex flex-col items-center text-rose-400 hover:text-rose-600 transition pt-1">
+            <i class="fa-solid fa-right-from-bracket text-xl mb-1"></i><span class="text-[10px] font-bold">Logout</span>
+        </button>
+    </div>
+
+    <div id="modalLapor" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+            <div class="bg-emerald-500 p-4 flex justify-between items-center">
+                <h3 class="font-bold text-white text-lg flex items-center gap-2"><i class="fa-solid fa-check-double text-emerald-100"></i> Lapor Bukti Kerja</h3>
+                <button onclick="tutupModalLapor()" class="text-emerald-100 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <form id="formLapor" class="space-y-4">
+                    <input type="hidden" id="laporQuestId">
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Quest yang disubmit:</label>
+                        <p id="laporQuestJudul" class="text-sm font-bold text-slate-800 bg-slate-50 p-3 rounded-lg border border-slate-200"></p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Catatan / Link Bukti <span class="text-rose-500">*</span></label>
+                        <textarea id="laporCatatan" rows="4" required placeholder="Contoh: Udah beres upload, ini link videonya: https://youtu.be/..." class="bg-white border border-slate-200 text-sm rounded-lg focus:border-emerald-500 block w-full p-3 shadow-sm"></textarea>
+                    </div>
+                    
+                    <button type="submit" id="btnSubmitLapor" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl mt-4 active:scale-95 transition shadow-md flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> KIRIM 
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzCaM4GScQqpluS2TGRizNVCMgcjWLrlz_4QDIPWC056RyGbx6DunE9fQetbbZIj2bt/exec';
+
+        const userRole = localStorage.getItem('yt_role');
+        const userName = localStorage.getItem('yt_user');
+        if (!userRole) { window.location.href = 'index.html'; }
+        if (userName) document.querySelectorAll('.display-username').forEach(el => el.innerText = userName);
+
+        function logoutApp() {
+            localStorage.removeItem('yt_role');
+            localStorage.removeItem('yt_user');
+            window.location.href = 'index.html';
+        }
+
+        function tutupModalLapor() { document.getElementById('modalLapor').classList.add('hidden'); }
+
+        function bukaModalLapor(idQuest, judulQuest) {
+            document.getElementById('laporQuestId').value = idQuest;
+            document.getElementById('laporQuestJudul').innerText = judulQuest;
+            document.getElementById('laporCatatan').value = '';
+            document.getElementById('modalLapor').classList.remove('hidden');
+        }
+
+        function loadCreatorQuests() {
+            const questContainer = document.getElementById('questListContainer');
+            const cacheBuster = new Date().getTime();
+
+            fetch(API_URL + '?action=get_quest&t=' + cacheBuster)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === 'success' && data.data.length > 0) {
+                        const myQuests = data.data.filter(q => q.target === userName || q.target === 'Semua Tim');
+                        if(myQuests.length === 0) {
+                            questContainer.innerHTML = '<div class="bg-white p-8 rounded-xl border border-dashed border-slate-300 text-center text-slate-400">Belum ada quest. Santai dulu!</div>';
+                            return;
+                        }
+
+                        const listHtml = myQuests.reverse().map(q => {
+                            let isMain = q.tipe.includes('Main');
+                            let icon = isMain ? '<i class="fa-solid fa-calendar-day"></i>' : '<i class="fa-solid fa-briefcase"></i>';
+                            let colorBg = isMain ? 'bg-blue-50' : 'bg-purple-100';
+                            let colorText = isMain ? 'text-blue-500' : 'text-purple-600';
+                            
+                            let safeJudul = q.judul.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                            // SMART BUTTON LOGIC & REJECTION NOTE
+                            let actionButton = '';
+                            let rejectHtml = '';
+                            let statBadge = '';
+
+                            if(q.status === 'Selesai') {
+                                statBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-600"><i class="fa-solid fa-check"></i> ACC</span>`;
+                                actionButton = `<div class="bg-emerald-50 text-emerald-600 font-bold py-2.5 px-6 rounded-lg mt-4 sm:mt-0 border border-emerald-200 shrink-0 text-center"><i class="fa-solid fa-check-double"></i> Done</div>`;
+                            } else if(q.status === 'Under Review') {
+                                statBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-600"><i class="fa-solid fa-hourglass-half"></i> MENUNGGU REVIEW </span>`;
+                                actionButton = `<div class="bg-amber-50 text-amber-600 font-bold py-2.5 px-6 rounded-lg mt-4 sm:mt-0 border border-amber-200 shrink-0 text-center"><i class="fa-solid fa-clock"></i> Under Review</div>`;
+                            } else if(q.status === 'Ditolak') {
+                                statBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-600"><i class="fa-solid fa-xmark"></i> REVISI</span>`;
+                                rejectHtml = `<div class="mt-3 bg-rose-50 border-l-4 border-rose-500 p-3 rounded-r-lg text-sm text-rose-700"><b>Catatan:</b> ${q.note_admin}</div>`;
+                                actionButton = `<button onclick="bukaModalLapor('${q.id}', '${safeJudul}')" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 px-6 rounded-lg mt-4 sm:mt-0 transition-all active:scale-95 shadow-md shrink-0"><i class="fa-solid fa-rotate-left mr-1"></i> Lapor Ulang</button>`;
+                            } else {
+                                statBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-500">PENDING</span>`;
+                                actionButton = `<button onclick="bukaModalLapor('${q.id}', '${safeJudul}')" class="bg-slate-900 hover:bg-blue-600 text-white font-bold py-2.5 px-6 rounded-lg mt-4 sm:mt-0 transition-all active:scale-95 shadow-md shrink-0"><i class="fa-solid fa-paper-plane mr-1"></i> Lapor</button>`;
+                            }
+
+                            return `
+                            <div class="quest-card bg-white border ${q.status === 'Ditolak' ? 'border-rose-300' : 'border-slate-200'} p-5 rounded-xl flex flex-col sm:flex-row sm:items-start justify-between shadow-sm transition-all hover:shadow-md">
+                                <div class="flex items-start gap-4 flex-1">
+                                    <div class="w-12 h-12 ${colorBg} ${colorText} rounded-lg flex items-center justify-center text-xl shrink-0 mt-1">
+                                        ${icon}
+                                    </div>
+                                    <div class="flex-1 pr-4">
+                                        <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                            <span class="text-[10px] font-black px-2 py-0.5 rounded ${isMain ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'} uppercase">${q.tipe}</span>
+                                            ${statBadge}
+                                        </div>
+                                        <h3 class="font-bold text-slate-800 text-base">${q.judul}</h3>
+                                        <p class="text-sm text-slate-500 mt-1">${q.keterangan}</p>
+                                        ${rejectHtml}
+                                    </div>
+                                </div>
+                                ${actionButton}
+                            </div>`;
+                        }).join('');
+                        
+                        questContainer.innerHTML = listHtml;
+                    } else {
+                        questContainer.innerHTML = '<div class="bg-white p-8 rounded-xl border border-dashed border-slate-300 text-center text-slate-400">Belum ada quest. Santai dulu!</div>';
+                    }
+                })
+                .catch(err => {
+                    questContainer.innerHTML = '<p class="text-center text-rose-500 py-4 font-bold">Gagal terhubung ke API.</p>';
+                });
+        }
+
+        function loadTotalRegis() {
+            fetch(API_URL + '?action=get_total_regis')
+                .then(res => res.json())
+                .then(data => {
+                    const display = document.getElementById('totalRegisCreator');
+                    if(display) display.innerText = (data.status === 'success') ? data.total.toLocaleString('en-US') : "0";
+                });
+        }
+
+        document.getElementById('formLapor').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitLapor');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> MENGIRIM...';
+            btn.disabled = true;
+
+            const params = new URLSearchParams();
+            params.append('action', 'update_quest_status'); // Rute API nangkep Bukti Kerja
+            params.append('id_quest', document.getElementById('laporQuestId').value);
+            params.append('catatan', document.getElementById('laporCatatan').value); // Bukti masuk Kolom G
+
+            fetch(API_URL, { method: 'POST', body: params })
+                .then(res => res.json())
+                .then(data => {
+                    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> KIRIM';
+                    btn.disabled = false;
+
+                    if(data.status === 'success') {
+                        tutupModalLapor();
+                        loadCreatorQuests(); 
+                    } else { alert("❌ Gagal melapor: " + data.message); }
+                })
+                .catch(err => {
+                    alert("Gagal koneksi ke server!");
+                    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> KIRIM';
+                    btn.disabled = false;
+                });
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCreatorQuests();
+            loadTotalRegis();
+        });
+
+        // TAMBAHIN BARIS INI BOS:
+        // Ini bakal nge-refresh tabel quest secara diam-diam tiap 30 detik (30.000 milidetik)
+        setInterval(() => {
+            loadCreatorQuests();
+            loadTotalRegis();
+        }, 30000);
+    </script>
+</body>
+</html>

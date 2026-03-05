@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - YT Quest Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .bg-animate { background-size: 200% 200%; animation: gradientMove 8s ease infinite; }
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    </style>
+</head>
+<body class="bg-slate-900 bg-animate bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 min-h-screen flex flex-col justify-center items-center p-4 antialiased">
+
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden relative z-10">
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-center relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmZmZmYiLz48L3N2Zz4=')]"></div>
+            <div class="relative z-10 flex flex-col items-center">
+                <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-blue-600 text-3xl shadow-lg mb-4 rotate-3 hover:rotate-0 transition-transform">
+                    <i class="fa-solid fa-gamepad"></i>
+                </div>
+                <h1 class="text-3xl font-black text-white tracking-wider">YT<span class="text-amber-400">QUEST</span></h1>
+                <p class="text-blue-100 text-sm mt-2 font-medium">Internal Creator Dashboard</p>
+            </div>
+        </div>
+
+        <div class="p-8">
+            <div id="alertError" class="hidden bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold px-4 py-3 rounded-lg mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-rose-500 text-sm"></i>
+                <span id="errorText">Username atau password salah bos!</span>
+            </div>
+
+            <form id="loginForm" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Username</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fa-solid fa-user text-slate-400"></i></div>
+                        <input type="text" id="username" required placeholder="Ketik username lu..." class="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full pl-11 p-3.5 font-bold transition-colors">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fa-solid fa-lock text-slate-400"></i></div>
+                        <input type="password" id="password" required placeholder="••••••••" class="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full pl-11 p-3.5 font-bold transition-colors">
+                    </div>
+                </div>
+                <button type="submit" id="btnLogin" class="w-full bg-slate-900 hover:bg-blue-600 text-white font-black text-base py-4 rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-[0.98] flex justify-center items-center gap-2 mt-4">
+                    LOGIN SEKARANG <i class="fa-solid fa-right-to-bracket ml-1"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // URL API Google Script Lu
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzCaM4GScQqpluS2TGRizNVCMgcjWLrlz_4QDIPWC056RyGbx6DunE9fQetbbZIj2bt/exec';
+
+        const form = document.getElementById('loginForm');
+        const alertError = document.getElementById('alertError');
+        const errorText = document.getElementById('errorText');
+        const btnLogin = document.getElementById('btnLogin');
+
+        // Pengecekan sesi login
+        window.onload = () => {
+            const loggedInRole = localStorage.getItem('yt_role');
+            if (loggedInRole === 'admin') window.location.href = 'admin-dashboard.html';
+            else if (loggedInRole === 'creator') window.location.href = 'creator-dashboard.html';
+        };
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alertError.classList.add('hidden');
+            
+            const originalText = btnLogin.innerHTML;
+            btnLogin.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> VERIFIKASI KE DATABASE...';
+            btnLogin.classList.add('opacity-80', 'cursor-not-allowed');
+
+            const userVal = document.getElementById('username').value;
+            const passVal = document.getElementById('password').value;
+
+            // Bungkus data biar gampang dibaca GAS
+            const formData = new URLSearchParams();
+            formData.append('action', 'login');
+            formData.append('username', userVal);
+            formData.append('password', passVal);
+
+            // Tembak API
+            fetch(API_URL, { method: 'POST', body: formData })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Kunci sukses, simpan di HP
+                        localStorage.setItem('yt_user', data.username);
+                        localStorage.setItem('yt_role', data.role);
+                        
+                        // Lempar sesuai Role
+                        if (data.role === 'admin') window.location.href = 'admin-dashboard.html';
+                        else window.location.href = 'creator-dashboard.html';
+                    } else {
+                        // Kalau salah password / username
+                        btnLogin.innerHTML = originalText;
+                        btnLogin.classList.remove('opacity-80', 'cursor-not-allowed');
+                        errorText.innerText = data.message;
+                        alertError.classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    btnLogin.innerHTML = originalText;
+                    btnLogin.classList.remove('opacity-80', 'cursor-not-allowed');
+                    errorText.innerText = "Gagal konek ke database. Cek sinyal lu bos!";
+                    alertError.classList.remove('hidden');
+                });
+        });
+    </script>
+</body>
+</html>

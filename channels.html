@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Channel & Farming</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 font-sans antialiased text-slate-800 pb-24 md:pb-8">
+
+    <header class="bg-slate-900 text-white p-4 shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="javascript:history.back()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition">
+                    <i class="fa-solid fa-arrow-left text-sm"></i>
+                </a>
+                <h1 class="font-bold text-lg tracking-wide flex items-center gap-2">
+                    <i class="fa-brands fa-youtube text-red-500"></i> Database Channel
+                </h1>
+            </div>
+            <button onclick="toggleModalTambah()" class="hidden md:flex bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-lg items-center gap-2 transition active:scale-95">
+                <i class="fa-solid fa-plus"></i> Tambah Akun
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 md:px-6 py-6 w-full relative">
+
+        <div class="bg-white p-1.5 rounded-xl shadow-sm border border-slate-200 flex mb-6 relative">
+            <button id="tabUtama" class="flex-1 py-2.5 text-sm font-bold rounded-lg text-white bg-slate-900 shadow transition-all duration-300">
+                <i class="fa-solid fa-star text-amber-400 mr-1"></i> Akun Utama
+            </button>
+            <button id="tabFarming" class="flex-1 py-2.5 text-sm font-bold rounded-lg text-slate-500 hover:text-slate-800 transition-all duration-300">
+                <i class="fa-solid fa-tractor text-slate-400 mr-1"></i> Akun Farming
+            </button>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-3 mb-6">
+            <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+                </div>
+                <input type="text" id="searchInput" placeholder="Cari nama channel, email, atau PIC..." class="bg-white border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-3 shadow-sm transition-all">
+            </div>
+            <button onclick="toggleModalFilter()" class="bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold py-3 px-4 rounded-xl shadow-sm text-sm flex items-center justify-center gap-2 transition active:scale-95">
+                <i class="fa-solid fa-filter"></i> Filter
+            </button>
+        </div>
+
+        <div id="contentUtama" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-500">
+                    <thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b border-slate-200">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Info Channel</th>
+                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Kredensial Login</th>
+                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Status</th>
+                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">PIC (Kreator)</th>
+                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyUtama" class="divide-y divide-slate-100">
+                        <tr><td colspan="5" class="text-center py-8"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-blue-500 mb-2"></i><br>Memuat Data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="contentFarming" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-500">
+                    <thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b border-slate-200">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 whitespace-nowrap">ID / Niche</th>
+                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Kredensial Login</th>
+                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Tgl Pembuatan</th>
+                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Status</th>
+                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">PIC (Kreator)</th>
+                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyFarming" class="divide-y divide-slate-100">
+                        <tr><td colspan="6" class="text-center py-8"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-purple-500 mb-2"></i><br>Memuat Data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <button onclick="toggleModalTambah()" class="md:hidden fixed bottom-24 right-5 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl transition-transform active:scale-90 z-40">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <div class="fixed bottom-0 w-full max-w-md bg-white border-t border-slate-200 flex justify-around p-3 pb-safe shadow-[0_-5px_15px_-5px_rgba(0,0,0,0.1)] z-40 md:hidden left-1/2 transform -translate-x-1/2">
+        <a href="creator-dashboard.html" class="flex flex-col items-center text-slate-500 hover:text-blue-600 transition">
+            <i class="fa-solid fa-house text-xl mb-1"></i><span class="text-[10px] font-bold">Home</span>
+        </a>
+        <a href="channels.html" class="flex flex-col items-center text-blue-600 transition">
+            <i class="fa-brands fa-youtube text-xl mb-1"></i><span class="text-[10px] font-bold">Channel</span>
+        </a>
+        <a href="regis-youtube.html" class="flex flex-col items-center -mt-6 relative group">
+            <div class="w-14 h-14 bg-gradient-to-tr from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white text-2xl shadow-lg border-4 border-white active:scale-95 transition transform">
+                <i class="fa-solid fa-plus"></i>
+            </div><span class="text-[10px] font-bold text-slate-600 mt-1">Regis</span>
+        </a>
+        <button onclick="logoutApp()" class="flex flex-col items-center text-rose-400 hover:text-rose-600 transition pt-1">
+            <i class="fa-solid fa-right-from-bracket text-xl mb-1"></i><span class="text-[10px] font-bold">Logout</span>
+        </button>
+    </div>
+
+    <div id="modalTambah" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+            <div class="bg-slate-900 p-4 flex justify-between items-center">
+                <h3 class="font-bold text-white text-lg flex items-center gap-2"><i class="fa-solid fa-plus text-blue-400"></i> Tambah Akun</h3>
+                <button onclick="toggleModalTambah()" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <form id="formTambah" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Kategori</label>
+                            <select id="inputKategori" onchange="toggleKategoriParams()" class="bg-slate-50 border border-slate-200 text-sm rounded-lg block w-full p-2.5 font-medium">
+                                <option value="Akun Utama">Akun Utama</option>
+                                <option value="Akun Farming">Akun Farming</option>
+                            </select>
+                        </div>
+                        <div id="wrapUkuran">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Ukuran</label>
+                            <select id="inputUkuran" class="bg-slate-50 border border-slate-200 text-sm rounded-lg block w-full p-2.5 font-medium">
+                                <option value="Channel Besar">Channel Besar</option>
+                                <option value="Channel Kecil">Channel Kecil</option>
+                            </select>
+                        </div>
+                        <div id="wrapNiche" class="hidden">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Niche (Topik)</label>
+                            <input type="text" id="inputNiche" placeholder="misal: anime" class="lowercase bg-white border border-slate-200 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Nama / ID Channel</label>
+                        <input type="text" id="inputNama" required placeholder="Masukkan nama channel..." class="bg-white border border-slate-200 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Email Login</label>
+                            <input type="email" id="inputEmail" required placeholder="email@gmail.com" class="bg-white border border-slate-200 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+                            <input type="text" id="inputPassword" required placeholder="Ketik password..." class="bg-slate-50 border border-slate-200 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5 font-mono text-slate-900">
+                        </div>
+                    </div>
+                    <button type="submit" id="btnSimpanChannel" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl mt-4 active:scale-95 transition shadow-md hover:bg-blue-700">SIMPAN DATA</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalEdit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+            <div class="bg-amber-500 p-4 flex justify-between items-center">
+                <h3 class="font-bold text-white text-lg flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-amber-100"></i> Update Akun</h3>
+                <button onclick="tutupModalEdit()" class="text-amber-100 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <form id="formEdit" class="space-y-4">
+                    <input type="hidden" id="editOldNama">
+                    <input type="hidden" id="editKategori">
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Nama / ID Channel</label>
+                        <input type="text" id="editNama" required class="bg-white border border-slate-300 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5 font-bold text-slate-800">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div id="editWrapUkuran">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Ukuran Channel</label>
+                            <select id="editUkuran" class="bg-slate-50 border border-slate-200 text-sm rounded-lg block w-full p-2.5 font-medium text-slate-700">
+                                <option value="Channel Besar">Channel Besar</option>
+                                <option value="Channel Kecil">Channel Kecil</option>
+                            </select>
+                        </div>
+                        <div id="editWrapNiche" class="hidden">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Ubah Niche</label>
+                            <input type="text" id="editNiche" placeholder="Ubah niche..." class="lowercase bg-white border border-slate-200 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Status Keamanan</label>
+                            <select id="editStatus" class="bg-slate-50 border border-slate-200 text-sm rounded-lg block w-full p-2.5 font-medium text-slate-700">
+                                <option value="Aman">Aman</option>
+                                <option value="Warning">Warning</option>
+                                <option value="Strike">Strike</option>
+                                <option value="Deleted">Deleted</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Password Baru</label>
+                        <input type="text" id="editPassword" placeholder="Kosongkan jika tdk ganti" class="bg-white border border-slate-200 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5 font-mono">
+                    </div>
+                    <button type="submit" id="btnUpdateChannel" class="w-full bg-amber-500 text-white font-bold py-3 rounded-xl mt-4 active:scale-95 transition shadow-md hover:bg-amber-600">UPDATE DATA</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalFilter" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex justify-center items-end md:items-center p-4 transition-opacity">
+        <div class="bg-white rounded-t-3xl md:rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all pb-6 md:pb-0">
+            <div class="p-4 flex justify-between items-center border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2"><i class="fa-solid fa-filter text-slate-400"></i> Filter Data</h3>
+                <button onclick="toggleModalFilter()" class="text-slate-400 hover:text-slate-600 transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-2 uppercase">Berdasarkan Status</label>
+                        <div class="flex flex-wrap gap-2" id="filterStatusGroup">
+                            <button type="button" onclick="setFilterStatus(this, 'Semua')" class="filter-btn bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-full border border-slate-900 transition-colors">Semua</button>
+                            <button type="button" onclick="setFilterStatus(this, 'Aman')" class="filter-btn bg-white text-slate-600 hover:bg-slate-50 text-xs font-bold px-4 py-2 rounded-full border border-slate-200 transition-colors">Aman</button>
+                            <button type="button" onclick="setFilterStatus(this, 'Warning')" class="filter-btn bg-white text-slate-600 hover:bg-slate-50 text-xs font-bold px-4 py-2 rounded-full border border-slate-200 transition-colors">Warning</button>
+                            <button type="button" onclick="setFilterStatus(this, 'Strike')" class="filter-btn bg-white text-slate-600 hover:bg-slate-50 text-xs font-bold px-4 py-2 rounded-full border border-slate-200 transition-colors">Strike</button>
+                            <button type="button" onclick="setFilterStatus(this, 'Deleted')" class="filter-btn bg-white text-slate-600 hover:bg-slate-50 text-xs font-bold px-4 py-2 rounded-full border border-slate-200 transition-colors">Deleted</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="applyFilter()" class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl mt-6 active:scale-95 transition shadow-md hover:bg-slate-800">TERAPKAN FILTER</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzCaM4GScQqpluS2TGRizNVCMgcjWLrlz_4QDIPWC056RyGbx6DunE9fQetbbZIj2bt/exec';
+
+        const userRole = localStorage.getItem('yt_role');
+        const userName = localStorage.getItem('yt_user');
+        if (!userRole) window.location.href = 'index.html'; 
+
+        function logoutApp() {
+            localStorage.removeItem('yt_role');
+            localStorage.removeItem('yt_user');
+            window.location.href = 'index.html';
+        }
+
+        // BUKA TUTUP MODAL 
+        function toggleModalTambah() { document.getElementById('modalTambah').classList.toggle('hidden'); }
+        function toggleModalFilter() { document.getElementById('modalFilter').classList.toggle('hidden'); }
+        function tutupModalEdit() { document.getElementById('modalEdit').classList.add('hidden'); }
+        
+        function bukaModalEdit(kategori, idChannel, dataEkstra, statusKeamanan) {
+            document.getElementById('editOldNama').value = idChannel;
+            document.getElementById('editKategori').value = kategori;
+            document.getElementById('editNama').value = idChannel;
+
+            const statusFormatted = statusKeamanan.charAt(0).toUpperCase() + statusKeamanan.slice(1).toLowerCase();
+            const statSelect = document.getElementById('editStatus');
+            for(let i=0; i < statSelect.options.length; i++) {
+                if(statSelect.options[i].value === statusFormatted) {
+                    statSelect.selectedIndex = i; break;
+                }
+            }
+
+            if (kategori === 'Utama') {
+                document.getElementById('editWrapUkuran').classList.remove('hidden');
+                document.getElementById('editWrapNiche').classList.add('hidden');
+                const ukSelect = document.getElementById('editUkuran');
+                for(let i=0; i < ukSelect.options.length; i++) {
+                    if(ukSelect.options[i].value.toLowerCase() === dataEkstra.toLowerCase()) {
+                        ukSelect.selectedIndex = i; break;
+                    }
+                }
+            } else { 
+                document.getElementById('editWrapUkuran').classList.add('hidden');
+                document.getElementById('editWrapNiche').classList.remove('hidden');
+                document.getElementById('editNiche').value = dataEkstra;
+            }
+
+            document.getElementById('modalEdit').classList.remove('hidden');
+        }
+        
+        function hapusChannel(kategori, idChannel) {
+            if(confirm(`Yakin hapus channel "${idChannel}" secara permanen Bos?`)) {
+                const originalCursor = document.body.style.cursor;
+                document.body.style.cursor = 'wait';
+
+                const params = new URLSearchParams();
+                params.append('action', 'hapus_channel');
+                params.append('kategori', kategori);
+                params.append('id_channel', idChannel);
+
+                fetch(API_URL, { method: 'POST', body: params })
+                .then(res => res.json())
+                .then(data => {
+                    document.body.style.cursor = originalCursor;
+                    if(data.status === 'success') {
+                        loadChannels(); 
+                    } else {
+                        alert("❌ Gagal: " + data.message);
+                    }
+                })
+                .catch(err => {
+                    document.body.style.cursor = originalCursor;
+                    alert("Gagal koneksi server!");
+                });
+            }
+        }
+
+        function toggleKategoriParams() {
+            const kat = document.getElementById('inputKategori').value;
+            if(kat === 'Akun Utama') {
+                document.getElementById('wrapUkuran').classList.remove('hidden');
+                document.getElementById('wrapNiche').classList.add('hidden');
+            } else {
+                document.getElementById('wrapUkuran').classList.add('hidden');
+                document.getElementById('wrapNiche').classList.remove('hidden');
+            }
+        }
+
+        // ==========================================
+        // REVISI LOGIKA SWITCH TAB BIAR WARNA JELAS
+        // ==========================================
+        const tabUtama = document.getElementById('tabUtama');
+        const tabFarming = document.getElementById('tabFarming');
+        const contentUtama = document.getElementById('contentUtama');
+        const contentFarming = document.getElementById('contentFarming');
+
+        function switchTab(isFarming) {
+            if (isFarming) {
+                // Aktifkan tab Farming (Gelap)
+                tabFarming.classList.add('text-white', 'bg-slate-900', 'shadow');
+                tabFarming.classList.remove('text-slate-500', 'hover:text-slate-800');
+                
+                // Matikan tab Utama (Terang)
+                tabUtama.classList.remove('text-white', 'bg-slate-900', 'shadow');
+                tabUtama.classList.add('text-slate-500', 'hover:text-slate-800');
+                
+                contentFarming.classList.remove('hidden');
+                contentUtama.classList.add('hidden');
+            } else {
+                // Aktifkan tab Utama (Gelap)
+                tabUtama.classList.add('text-white', 'bg-slate-900', 'shadow');
+                tabUtama.classList.remove('text-slate-500', 'hover:text-slate-800');
+                
+                // Matikan tab Farming (Terang)
+                tabFarming.classList.remove('text-white', 'bg-slate-900', 'shadow');
+                tabFarming.classList.add('text-slate-500', 'hover:text-slate-800');
+                
+                contentUtama.classList.remove('hidden');
+                contentFarming.classList.add('hidden');
+            }
+            document.getElementById('searchInput').value = '';
+            runCombineFilter();
+        }
+
+        tabFarming.addEventListener('click', () => switchTab(true));
+        tabUtama.addEventListener('click', () => switchTab(false));
+
+        function getStatusBadge(status) {
+            const s = String(status).trim().toLowerCase();
+            if (s === 'aman') return `<span class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2 py-1 rounded border border-emerald-200"><i class="fa-solid fa-check mr-1"></i> AMAN</span>`;
+            if (s === 'warning') return `<span class="bg-amber-100 text-amber-700 text-[10px] font-black px-2 py-1 rounded border border-amber-200"><i class="fa-solid fa-triangle-exclamation mr-1"></i> WARNING</span>`;
+            if (s === 'strike') return `<span class="bg-orange-100 text-orange-700 text-[10px] font-black px-2 py-1 rounded border border-orange-200"><i class="fa-solid fa-bolt mr-1"></i> STRIKE</span>`;
+            if (s === 'deleted') return `<span class="bg-rose-100 text-rose-700 text-[10px] font-black px-2 py-1 rounded border border-rose-200"><i class="fa-solid fa-ban mr-1"></i> DELETED</span>`;
+            return `<span class="bg-slate-100 text-slate-700 text-[10px] font-black px-2 py-1 rounded border border-slate-200">${status.toUpperCase()}</span>`;
+        }
+
+        function loadChannels() {
+            const tbUtama = document.getElementById('tbodyUtama');
+            const tbFarming = document.getElementById('tbodyFarming');
+            
+            tbUtama.innerHTML = '<tr><td colspan="5" class="text-center py-10"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-blue-500 mb-3"></i><p class="text-slate-500 font-medium">Memuat Data Terbaru...</p></td></tr>';
+            tbFarming.innerHTML = '<tr><td colspan="6" class="text-center py-10"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-purple-500 mb-3"></i><p class="text-slate-500 font-medium">Memuat Data Terbaru...</p></td></tr>';
+
+            const cacheBuster = new Date().getTime();
+            
+            fetch(API_URL + '?action=get_channels&t=' + cacheBuster)
+                .then(res => res.json())
+                .then(data => {
+                    tbUtama.innerHTML = ''; tbFarming.innerHTML = '';
+
+                    if(data.status === 'success') {
+                        if(data.utama.length > 0) {
+                            data.utama.forEach(c => {
+                                tbUtama.innerHTML += `
+                                <tr class="hover:bg-slate-50 transition-colors search-row" data-status="${c.status.toLowerCase()}">
+                                    <td class="px-6 py-4 min-w-[180px]">
+                                        <p class="font-bold text-slate-900 text-base">${c.id}</p>
+                                        <span class="bg-purple-100 text-purple-700 text-[10px] font-black px-2 py-0.5 rounded border border-purple-200 mt-1 inline-block">${c.ukuran.toUpperCase()}</span>
+                                    </td>
+                                    <td class="px-6 py-4 min-w-[220px]">
+                                        <p class="text-xs text-slate-600 mb-1"><i class="fa-solid fa-envelope text-slate-400 mr-1"></i> ${c.email}</p>
+                                        <p class="text-xs font-mono text-slate-800 bg-slate-100 px-2 py-1 rounded inline-block border border-slate-200 shadow-inner font-bold"><i class="fa-solid fa-key text-amber-500 mr-1"></i> ${c.pass}</p>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">${getStatusBadge(c.status)}</td>
+                                    <td class="px-6 py-4 text-center font-bold text-slate-700">${c.pic}</td>
+                                    <td class="px-6 py-4 text-center">
+                                        <div class="flex justify-center gap-2">
+                                            <button onclick="bukaModalEdit('Utama', '${c.id}', '${c.ukuran}', '${c.status}')" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 py-1.5 px-3 rounded text-xs font-bold transition active:scale-95" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                                            <button onclick="hapusChannel('Utama', '${c.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 py-1.5 px-3 rounded text-xs font-bold transition active:scale-95" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>`;
+                            });
+                        } else { tbUtama.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400">Belum ada data channel utama.</td></tr>'; }
+
+                        if(data.farming.length > 0) {
+                            data.farming.forEach(c => {
+                                tbFarming.innerHTML += `
+                                <tr class="hover:bg-slate-50 transition-colors search-row" data-status="${c.status.toLowerCase()}">
+                                    <td class="px-6 py-4 min-w-[150px]">
+                                        <p class="font-bold text-slate-900 text-base">${c.id}</p>
+                                        <p class="text-xs text-slate-500 mt-0.5"><span class="font-semibold">Niche:</span> ${c.niche}</p>
+                                    </td>
+                                    <td class="px-6 py-4 min-w-[220px]">
+                                        <p class="text-xs text-slate-600 mb-1"><i class="fa-solid fa-envelope text-slate-400 mr-1"></i> ${c.email}</p>
+                                        <p class="text-xs font-mono text-slate-800 bg-slate-100 px-2 py-1 rounded inline-block border border-slate-200 shadow-inner font-bold"><i class="fa-solid fa-key text-amber-500 mr-1"></i> ${c.pass}</p>
+                                    </td>
+                                    <td class="px-6 py-4 text-center font-bold text-slate-700">${c.tgl}</td>
+                                    <td class="px-6 py-4 text-center">${getStatusBadge(c.status)}</td>
+                                    <td class="px-6 py-4 text-center font-bold text-slate-700">${c.pic}</td>
+                                    <td class="px-6 py-4 text-center">
+                                        <div class="flex justify-center gap-2">
+                                            <button onclick="bukaModalEdit('Farming', '${c.id}', '${c.niche}', '${c.status}')" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 py-1.5 px-3 rounded text-xs font-bold transition active:scale-95" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                                            <button onclick="hapusChannel('Farming', '${c.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 py-1.5 px-3 rounded text-xs font-bold transition active:scale-95" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>`;
+                            });
+                        } else { tbFarming.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-slate-400">Belum ada data akun farming.</td></tr>'; }
+                    }
+                });
+        }
+
+        document.getElementById('formTambah').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSimpanChannel');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+            btn.disabled = true;
+
+            const params = new URLSearchParams();
+            params.append('action', 'tambah_channel');
+            params.append('kategori', document.getElementById('inputKategori').value);
+            params.append('ukuran', document.getElementById('inputUkuran').value);
+            params.append('niche', document.getElementById('inputNiche').value.toLowerCase());
+            params.append('nama', document.getElementById('inputNama').value);
+            params.append('email', document.getElementById('inputEmail').value);
+            params.append('password', document.getElementById('inputPassword').value);
+            params.append('pic', userName);
+
+            fetch(API_URL, { method: 'POST', body: params })
+                .then(res => res.json())
+                .then(data => {
+                    btn.innerHTML = 'SIMPAN DATA';
+                    btn.disabled = false;
+                    if(data.status === 'success') {
+                        toggleModalTambah();
+                        document.getElementById('formTambah').reset();
+                        document.getElementById('wrapUkuran').classList.remove('hidden');
+                        document.getElementById('wrapNiche').classList.add('hidden');
+                        loadChannels();
+                    }
+                });
+        });
+
+        document.getElementById('formEdit').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnUpdateChannel');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengupdate...';
+            btn.disabled = true;
+
+            const params = new URLSearchParams();
+            params.append('action', 'edit_channel');
+            params.append('old_id', document.getElementById('editOldNama').value);
+            params.append('new_id', document.getElementById('editNama').value);
+            params.append('kategori', document.getElementById('editKategori').value);
+            params.append('ukuran', document.getElementById('editUkuran').value);
+            params.append('niche', document.getElementById('editNiche').value.toLowerCase());
+            params.append('status', document.getElementById('editStatus').value);
+            params.append('password', document.getElementById('editPassword').value);
+
+            fetch(API_URL, { method: 'POST', body: params })
+                .then(res => res.json())
+                .then(data => {
+                    btn.innerHTML = 'UPDATE DATA';
+                    btn.disabled = false;
+                    if(data.status === 'success') {
+                        tutupModalEdit();
+                        document.getElementById('formEdit').reset();
+                        loadChannels(); 
+                    } else {
+                        alert("❌ Gagal: " + data.message);
+                    }
+                })
+                .catch(err => {
+                    btn.innerHTML = 'UPDATE DATA';
+                    btn.disabled = false;
+                    alert("Terjadi kesalahan jaringan.");
+                });
+        });
+
+        let filterStatusActive = 'Semua';
+
+        function setFilterStatus(btnElement, status) {
+            const btns = document.querySelectorAll('#filterStatusGroup .filter-btn');
+            btns.forEach(b => {
+                b.className = 'filter-btn bg-white text-slate-600 hover:bg-slate-50 text-xs font-bold px-4 py-2 rounded-full border border-slate-200 transition-colors';
+            });
+            btnElement.className = 'filter-btn bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-full border border-slate-900 transition-colors';
+            filterStatusActive = status;
+        }
+
+        function applyFilter() {
+            toggleModalFilter(); 
+            runCombineFilter();  
+        }
+
+        function runCombineFilter() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('.search-row');
+            
+            rows.forEach(row => {
+                const textData = row.innerText.toLowerCase();
+                const rowStatus = row.getAttribute('data-status');
+
+                const matchSearch = textData.includes(keyword);
+                let matchStatus = true;
+                
+                if(filterStatusActive !== 'Semua') {
+                    matchStatus = (rowStatus === filterStatusActive.toLowerCase());
+                }
+
+                if(matchSearch && matchStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('input', runCombineFilter);
+
+        window.onload = loadChannels;
+    </script>
+</body>
+</html>

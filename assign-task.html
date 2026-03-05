@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Quest - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 font-sans antialiased text-slate-800 pb-24 md:pb-8">
+
+    <header class="bg-slate-900 text-white p-4 shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="admin-dashboard.html" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition active:scale-95">
+                    <i class="fa-solid fa-arrow-left text-sm"></i>
+                </a>
+                <h1 class="font-bold text-lg tracking-wide flex items-center gap-2">
+                    <i class="fa-solid fa-scroll text-purple-400"></i> Manajemen Quest
+                </h1>
+            </div>
+            <button onclick="toggleModal()" class="hidden md:flex bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-lg items-center gap-2 transition active:scale-95">
+                <i class="fa-solid fa-plus"></i> Beri Quest
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 md:px-6 py-8 w-full">
+        <div class="mb-6 flex justify-between items-end">
+            <div>
+                <h2 class="text-2xl font-black text-slate-800">Daftar Quest Aktif</h2>
+                <p class="text-sm text-slate-500">Pantau dan review hasil kerja tim lu di sini.</p>
+            </div>
+            <button onclick="loadQuests()" class="text-blue-600 hover:text-blue-800 font-bold text-sm flex items-center gap-1 transition active:scale-95">
+                <i class="fa-solid fa-rotate-right"></i> Refresh
+            </button>
+        </div>
+
+        <div id="questListContainer" class="space-y-4">
+            <div class="text-center py-10 text-slate-400">
+                <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3 text-blue-500"></i>
+                <p>Menarik data dari database Bos...</p>
+            </div>
+        </div>
+    </main>
+
+    <button onclick="toggleModal()" class="md:hidden fixed bottom-6 right-5 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl transition-transform active:scale-90 z-40">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <div id="modalQuest" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+            <div class="bg-slate-900 p-4 flex justify-between items-center">
+                <h3 class="font-bold text-white text-lg flex items-center gap-2"><i class="fa-solid fa-hammer text-amber-400"></i> Beri Quest Baru</h3>
+                <button onclick="toggleModal()" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <form id="formQuest" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Tipe Quest</label>
+                            <select id="inputTipe" onchange="toggleDeadline()" class="bg-slate-50 border border-slate-200 text-sm rounded-lg block w-full p-2.5 font-medium">
+                                <option value="Main Quest">Main Quest (Rutin)</option>
+                                <option value="Side Quest">Side Quest (Dadakan)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Berikan Ke</label>
+                            <select id="inputTarget" required class="bg-slate-50 border border-slate-200 text-sm rounded-lg block w-full p-2.5 font-medium">
+                                <option value="">Memuat tim...</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="wrapDeadline" class="hidden">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Deadline / Waktu <span class="text-slate-400 font-normal">(Opsional)</span></label>
+                        <input type="text" id="inputDeadline" placeholder="Misal: Hari ini 18:00 WIB" class="bg-white border border-slate-200 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Judul Quest</label>
+                        <input type="text" id="inputJudul" placeholder="Misal: Upload 2 Video" required class="bg-white border border-slate-200 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Detail / Keterangan</label>
+                        <textarea id="inputKeterangan" rows="3" placeholder="Ketik deskripsi tugas di sini..." required class="bg-white border border-slate-200 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5"></textarea>
+                    </div>
+                    <button type="submit" id="btnSimpan" class="w-full bg-slate-900 hover:bg-blue-600 text-white font-bold py-3 rounded-xl mt-4 active:scale-95 transition shadow-md">PUBLISH QUEST</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalReview" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all border-t-4 border-amber-400">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="font-black text-slate-800 text-lg flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-amber-500"></i> Review Laporan</h3>
+                <button onclick="tutupModalReview()" class="text-slate-400 hover:text-slate-700 transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <input type="hidden" id="reviewQuestId">
+                
+                <div class="mb-4">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Kreator & Quest</p>
+                    <p id="reviewTarget" class="font-bold text-blue-600 text-sm mb-0.5"></p>
+                    <p id="reviewJudul" class="font-bold text-slate-800"></p>
+                </div>
+
+                <div class="mb-6">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Bukti Laporan / Catatan Kreator</p>
+                    <div id="reviewBukti" class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm text-slate-700 break-words whitespace-pre-wrap"></div>
+                </div>
+
+                <div class="mb-6" id="wrapAlasanTolak" style="display:none;">
+                    <label class="block text-xs font-bold text-rose-500 mb-1">Alasan Penolakan (Revisi) *</label>
+                    <textarea id="reviewAlasan" rows="2" placeholder="Kasih tau apa yang salah biar dia benerin..." class="bg-rose-50 border border-rose-200 text-sm rounded-lg focus:border-rose-500 block w-full p-2.5"></textarea>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="submitReview('Ditolak')" class="flex-1 bg-white border-2 border-rose-500 text-rose-500 hover:bg-rose-50 font-bold py-3 rounded-xl transition active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-xmark"></i> TOLAK
+                    </button>
+                    <button type="button" onclick="submitReview('Selesai')" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition active:scale-95 shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i> ACC
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzCaM4GScQqpluS2TGRizNVCMgcjWLrlz_4QDIPWC056RyGbx6DunE9fQetbbZIj2bt/exec';
+
+        function toggleDeadline() {
+            if(document.getElementById('inputTipe').value.includes('Side Quest')) {
+                document.getElementById('wrapDeadline').classList.remove('hidden');
+            } else { document.getElementById('wrapDeadline').classList.add('hidden'); }
+        }
+
+        function toggleModal() { document.getElementById('modalQuest').classList.toggle('hidden'); }
+        function tutupModalReview() { 
+            document.getElementById('modalReview').classList.add('hidden'); 
+            document.getElementById('wrapAlasanTolak').style.display = 'none'; // Reset kotak tolak
+        }
+
+        function fetchCreators() {
+            const targetSelectAdd = document.getElementById('inputTarget');
+            fetch(API_URL + '?action=get_creators')
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        let options = '<option value="Semua Tim">Semua Tim</option>';
+                        data.data.forEach(name => { options += `<option value="${name}">${name}</option>`; });
+                        targetSelectAdd.innerHTML = options;
+                    }
+                });
+        }
+
+        // BUKA MODAL REVIEW KALO BOS MAU CEK LAPORAN
+        function bukaModalReview(id, target, judul, bukti) {
+            document.getElementById('reviewQuestId').value = id;
+            document.getElementById('reviewTarget').innerHTML = `<i class="fa-solid fa-user text-[10px]"></i> @${target}`;
+            document.getElementById('reviewJudul').innerText = judul;
+            document.getElementById('reviewBukti').innerText = bukti || "Tidak ada catatan terlampir.";
+            document.getElementById('reviewAlasan').value = '';
+            
+            document.getElementById('modalReview').classList.remove('hidden');
+        }
+
+        // PROSES SUBMIT REVIEW (ACC ATAU TOLAK)
+        function submitReview(keputusan) {
+            const idQuest = document.getElementById('reviewQuestId').value;
+            let noteAdmin = "";
+
+            if (keputusan === 'Ditolak') {
+                noteAdmin = document.getElementById('reviewAlasan').value;
+                if (!noteAdmin) {
+                    // Kalo blm ngisi alasan, keluarin kotaknya
+                    document.getElementById('wrapAlasanTolak').style.display = 'block';
+                    document.getElementById('reviewAlasan').focus();
+                    return; // Stop dulu sampai bos ngisi alasan
+                }
+            }
+
+            const confirmMsg = keputusan === 'Selesai' ? "Yakin ACC kerjaan ini Bos?" : "Yakin mau TOLAK dan suruh revisi?";
+            if(confirm(confirmMsg)) {
+                const originalCursor = document.body.style.cursor;
+                document.body.style.cursor = 'wait';
+
+                const params = new URLSearchParams();
+                params.append('action', 'review_quest');
+                params.append('id_quest', idQuest);
+                params.append('status', keputusan);
+                params.append('note_admin', noteAdmin);
+
+                fetch(API_URL, { method: 'POST', body: params })
+                .then(res => res.json())
+                .then(data => {
+                    document.body.style.cursor = originalCursor;
+                    if(data.status === 'success') {
+                        tutupModalReview();
+                        loadQuests(); // Refresh tabel
+                    } else { alert("❌ Gagal: " + data.message); }
+                });
+            }
+        }
+
+        function hapusQuest(idQuest) {
+            if(confirm(`Hapus quest "${idQuest}" secara permanen?`)) {
+                const params = new URLSearchParams();
+                params.append('action', 'hapus_quest');
+                params.append('id_quest', idQuest);
+                fetch(API_URL, { method: 'POST', body: params }).then(() => loadQuests());
+            }
+        }
+
+        function loadQuests() {
+            const container = document.getElementById('questListContainer');
+            container.innerHTML = '<div class="text-center py-10 text-slate-400"><i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3 text-blue-500"></i><p>Menyinkronkan Data...</p></div>';
+            
+            fetch(API_URL + '?action=get_quest&t=' + new Date().getTime())
+                .then(res => res.json())
+                .then(data => {
+                    container.innerHTML = ''; 
+                    
+                    if(data.status === 'success' && data.data.length > 0) {
+                        data.data.reverse().forEach(q => {
+                            let isMain = q.tipe.includes('Main');
+                            let icon = isMain ? '<i class="fa-solid fa-calendar-day"></i>' : '<i class="fa-solid fa-briefcase"></i>';
+                            
+                            // UI WARNA CARD BERDASARKAN STATUS
+                            let cardBorder = 'border-slate-200';
+                            let statBadge = '';
+                            let actionHtml = '';
+
+                            let safeJudul = q.judul.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                            let safeBukti = (q.bukti_creator || "").replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                            if(q.status === 'Under Review') {
+                                cardBorder = 'border-amber-300 bg-amber-50/30';
+                                statBadge = `<span class="inline-block mt-2 text-[10px] font-bold px-2 py-1 rounded-md bg-amber-100 text-amber-600"><i class="fa-solid fa-bell fa-shake mr-1"></i> BUTUH REVIEW</span>`;
+                                actionHtml = `<button onclick="bukaModalReview('${q.id}', '${q.target}', '${safeJudul}', '${safeBukti}')" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white py-2 px-5 rounded-lg text-sm font-bold shadow-md transition active:scale-95"><i class="fa-solid fa-eye mr-1"></i> Review Laporan</button>`;
+                            } else if(q.status === 'Selesai') {
+                                statBadge = `<span class="inline-block mt-2 text-[10px] font-bold px-2 py-1 rounded-md bg-emerald-100 text-emerald-600"><i class="fa-solid fa-check mr-1"></i> SELESAI ACC</span>`;
+                            } else if(q.status === 'Ditolak') {
+                                statBadge = `<span class="inline-block mt-2 text-[10px] font-bold px-2 py-1 rounded-md bg-rose-100 text-rose-600"><i class="fa-solid fa-xmark mr-1"></i> REVISI</span>`;
+                            } else {
+                                statBadge = `<span class="inline-block mt-2 text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100 text-slate-500">PENDING</span>`;
+                            }
+
+                            // Tombol Hapus nempel terus
+                            let btnHapus = `<button onclick="hapusQuest('${q.id}')" class="text-rose-400 hover:text-rose-600 p-2 rounded-lg transition" title="Hapus"><i class="fa-solid fa-trash"></i></button>`;
+
+                            let html = `
+                            <div class="bg-white rounded-xl shadow-sm border ${cardBorder} p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4 transition hover:shadow-md">
+                                <div class="flex items-start gap-4 flex-1">
+                                    <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500 text-xl shrink-0 mt-1">
+                                        ${icon}
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                            <span class="text-[10px] font-black px-2 py-0.5 rounded ${isMain ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'} uppercase">${q.tipe}</span>
+                                            <span class="text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded"><i class="fa-solid fa-user text-[8px] mr-1"></i> ${q.target}</span>
+                                        </div>
+                                        <h3 class="font-bold text-slate-800 text-base">${q.judul}</h3>
+                                        <p class="text-sm text-slate-500 mt-1">${q.keterangan}</p>
+                                        ${statBadge}
+                                    </div>
+                                </div>
+                                <div class="flex sm:flex-col items-end justify-between sm:justify-start gap-2 shrink-0 border-t sm:border-t-0 border-slate-100 pt-3 sm:pt-0 mt-2 sm:mt-0">
+                                    ${actionHtml}
+                                    ${btnHapus}
+                                </div>
+                            </div>`;
+                            container.innerHTML += html;
+                        });
+                    } else {
+                        container.innerHTML = '<div class="text-center py-10 text-slate-400 bg-white rounded-xl border border-dashed border-slate-300"><i class="fa-solid fa-box-open text-4xl mb-3 text-slate-300"></i><p>Belum ada quest. Yuk bikin!</p></div>';
+                    }
+                });
+        }
+
+        document.getElementById('formQuest').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSimpan');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> MENYIMPAN...';
+            btn.disabled = true;
+
+            const params = new URLSearchParams();
+            params.append('action', 'tambah_quest');
+            params.append('tipe', document.getElementById('inputTipe').value);
+            params.append('target', document.getElementById('inputTarget').value);
+            params.append('judul', document.getElementById('inputJudul').value);
+            params.append('keterangan', document.getElementById('inputKeterangan').value);
+            if(document.getElementById('inputTipe').value.includes('Side Quest')) params.append('deadline', document.getElementById('inputDeadline').value);
+
+            fetch(API_URL, { method: 'POST', body: params })
+                .then(res => res.json())
+                .then(data => {
+                    btn.innerHTML = 'PUBLISH QUEST';
+                    btn.disabled = false;
+                    if(data.status === 'success') {
+                        toggleModal(); document.getElementById('formQuest').reset(); loadQuests(); 
+                    } else { alert("❌ Gagal: " + data.message); }
+                });
+        });
+
+        window.onload = () => { fetchCreators(); loadQuests(); };
+    </script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen User - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 font-sans antialiased text-slate-800 pb-24 md:pb-8">
+
+    <header class="bg-slate-900 text-white p-4 shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="admin-dashboard.html" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition">
+                    <i class="fa-solid fa-arrow-left text-sm"></i>
+                </a>
+                <h1 class="font-bold text-lg tracking-wide flex items-center gap-2">
+                    <i class="fa-solid fa-users-gear text-emerald-400"></i> Manajemen Tim
+                </h1>
+            </div>
+            <button onclick="toggleModalTambah()" class="hidden md:flex bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-lg items-center gap-2 transition active:scale-95">
+                <i class="fa-solid fa-user-plus"></i> Tambah User
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 md:px-6 py-6 w-full relative">
+        <div class="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h2 class="text-2xl font-black text-slate-800">Daftar Akun Tim</h2>
+                <p class="text-sm text-slate-500">Atur akses login untuk Admin dan Creator di sini.</p>
+            </div>
+            <div class="relative w-full md:w-72">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+                </div>
+                <input type="text" id="searchInput" placeholder="Cari username..." class="bg-white border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 shadow-sm transition-all">
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-500">
+                    <thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b border-slate-200">
+                        <tr>
+                            <th scope="col" class="px-6 py-4">Username</th>
+                            <th scope="col" class="px-6 py-4">Password</th>
+                            <th scope="col" class="px-6 py-4 text-center">Role</th>
+                            <th scope="col" class="px-6 py-4 text-center">Status</th>
+                            <th scope="col" class="px-6 py-4 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyUsers" class="divide-y divide-slate-100">
+                        <tr><td colspan="5" class="text-center py-8"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-emerald-500 mb-2"></i><br>Memuat Data Tim...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <button onclick="toggleModalTambah()" class="md:hidden fixed bottom-24 right-5 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl transition-transform active:scale-90 z-40">
+        <i class="fa-solid fa-user-plus"></i>
+    </button>
+
+    <div class="fixed bottom-0 w-full max-w-md bg-white border-t border-slate-200 flex justify-around p-3 pb-safe shadow-[0_-5px_15px_-5px_rgba(0,0,0,0.1)] z-40 md:hidden left-1/2 transform -translate-x-1/2">
+        <a href="admin-dashboard.html" class="flex flex-col items-center text-slate-500 hover:text-blue-600 transition">
+            <i class="fa-solid fa-house text-xl mb-1"></i><span class="text-[10px] font-bold">Home</span>
+        </a>
+        <a href="assign-task.html" class="flex flex-col items-center text-slate-500 hover:text-blue-600 transition">
+            <i class="fa-solid fa-list-check text-xl mb-1"></i><span class="text-[10px] font-bold">Quest</span>
+        </a>
+        <a href="#" class="flex flex-col items-center text-emerald-600 transition -mt-6 relative group">
+            <div class="w-14 h-14 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full flex items-center justify-center text-white text-2xl shadow-lg border-4 border-white active:scale-95 transition transform">
+                <i class="fa-solid fa-users"></i>
+            </div><span class="text-[10px] font-bold text-slate-600 mt-1">Users</span>
+        </a>
+        <button onclick="logoutApp()" class="flex flex-col items-center text-rose-400 hover:text-rose-600 transition pt-1">
+            <i class="fa-solid fa-right-from-bracket text-xl mb-1"></i><span class="text-[10px] font-bold">Logout</span>
+        </button>
+    </div>
+
+    <div id="modalTambah" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+            <div class="bg-slate-900 p-4 flex justify-between items-center">
+                <h3 class="font-bold text-white text-lg flex items-center gap-2"><i class="fa-solid fa-user-plus text-emerald-400"></i> Buat Akun Baru</h3>
+                <button onclick="toggleModalTambah()" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <form id="formTambah" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Username <span class="text-rose-500">*</span></label>
+                        <input type="text" id="inputUsername" required placeholder="misal: budi_shorts" class="bg-white border border-slate-200 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Password <span class="text-rose-500">*</span></label>
+                        <input type="text" id="inputPassword" required placeholder="Buat password login..." class="bg-slate-50 border border-slate-200 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5 font-mono">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Role Akses</label>
+                            <select id="inputRole" class="bg-slate-50 border border-slate-200 text-sm rounded-lg block w-full p-2.5 font-medium">
+                                <option value="creator">Creator (Tim)</option>
+                                <option value="admin">Admin (Bos)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Status Akun</label>
+                            <select id="inputStatus" class="bg-slate-50 border border-slate-200 text-sm rounded-lg block w-full p-2.5 font-medium">
+                                <option value="Aktif">Aktif</option>
+                                <option value="Nonaktif">Nonaktif</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" id="btnSimpan" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl mt-4 active:scale-95 transition shadow-md hover:bg-emerald-700">SIMPAN USER</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalEdit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+            <div class="bg-emerald-500 p-4 flex justify-between items-center">
+                <h3 class="font-bold text-white text-lg flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-emerald-100"></i> Edit Akun</h3>
+                <button onclick="tutupModalEdit()" class="text-emerald-100 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <form id="formEdit" class="space-y-4">
+                    <input type="hidden" id="editOldUsername">
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Username Baru</label>
+                        <input type="text" id="editUsername" required class="bg-white border border-slate-300 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5 font-bold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Password Baru (Opsional)</label>
+                        <input type="text" id="editPassword" placeholder="Kosongkan jika tidak ganti" class="bg-slate-50 border border-slate-200 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5 font-mono">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Role Akses</label>
+                            <select id="editRole" class="bg-slate-50 border border-slate-200 text-sm rounded-lg block w-full p-2.5 font-medium text-slate-700">
+                                <option value="admin">Admin</option>
+                                <option value="creator">Creator</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Status Akun</label>
+                            <select id="editStatus" class="bg-slate-50 border border-slate-200 text-sm rounded-lg block w-full p-2.5 font-medium text-slate-700">
+                                <option value="Aktif">Aktif</option>
+                                <option value="Nonaktif">Nonaktif</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" id="btnUpdate" class="w-full bg-emerald-500 text-white font-bold py-3 rounded-xl mt-4 active:scale-95 transition shadow-md hover:bg-emerald-600">UPDATE USER</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MENGGUNAKAN URL API TERBARU DARI BOS!
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzCaM4GScQqpluS2TGRizNVCMgcjWLrlz_4QDIPWC056RyGbx6DunE9fQetbbZIj2bt/exec';
+
+        const userRole = localStorage.getItem('yt_role');
+        if (userRole !== 'admin') window.location.href = 'index.html'; 
+
+        function logoutApp() {
+            localStorage.removeItem('yt_role');
+            localStorage.removeItem('yt_user');
+            window.location.href = 'index.html';
+        }
+
+        // BUKA TUTUP MODAL
+        function toggleModalTambah() { document.getElementById('modalTambah').classList.toggle('hidden'); }
+        function tutupModalEdit() { document.getElementById('modalEdit').classList.add('hidden'); }
+        
+        // FUNGSI PRE-FILL MODAL EDIT
+        function bukaModalEdit(username, role, status) {
+            document.getElementById('editOldUsername').value = username;
+            document.getElementById('editUsername').value = username;
+            
+            // Set Role
+            const roleSelect = document.getElementById('editRole');
+            for(let i=0; i < roleSelect.options.length; i++) {
+                if(roleSelect.options[i].value === role.toLowerCase()) {
+                    roleSelect.selectedIndex = i; break;
+                }
+            }
+
+            // Set Status
+            const statSelect = document.getElementById('editStatus');
+            for(let i=0; i < statSelect.options.length; i++) {
+                if(statSelect.options[i].value.toLowerCase() === status.toLowerCase()) {
+                    statSelect.selectedIndex = i; break;
+                }
+            }
+
+            document.getElementById('modalEdit').classList.remove('hidden');
+        }
+
+        // FUNGSI HAPUS USER
+        function hapusUser(username) {
+            // Proteksi biar lu gak sengaja hapus akun lu sendiri
+            if (username.toLowerCase() === localStorage.getItem('yt_user').toLowerCase()) {
+                alert("❌ Bos, lu gak bisa ngehapus akun lu sendiri yang lagi login!");
+                return;
+            }
+
+            if(confirm(`Yakin mau menghapus akun "${username}" secara permanen? Orang ini gak bakal bisa login lagi!`)) {
+                const originalCursor = document.body.style.cursor;
+                document.body.style.cursor = 'wait';
+
+                const params = new URLSearchParams();
+                params.append('action', 'hapus_user');
+                params.append('username', username);
+
+                fetch(API_URL, { method: 'POST', body: params })
+                .then(res => res.json())
+                .then(data => {
+                    document.body.style.cursor = originalCursor;
+                    if(data.status === 'success') {
+                        loadUsers(); // Auto Refresh
+                    } else {
+                        alert("❌ Gagal: " + data.message);
+                    }
+                })
+                .catch(err => {
+                    document.body.style.cursor = originalCursor;
+                    alert("Gagal koneksi ke server!");
+                });
+            }
+        }
+
+        // FUNGSI LOAD DATA USERS
+        function loadUsers() {
+            const tbUsers = document.getElementById('tbodyUsers');
+            tbUsers.innerHTML = '<tr><td colspan="5" class="text-center py-10"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-emerald-500 mb-3"></i><p class="text-slate-500 font-medium">Memuat Data User...</p></td></tr>';
+            
+            const cacheBuster = new Date().getTime();
+            fetch(API_URL + '?action=get_users&t=' + cacheBuster)
+                .then(res => res.json())
+                .then(data => {
+                    tbUsers.innerHTML = ''; 
+
+                    if(data.status === 'success' && data.data.length > 0) {
+                        data.data.forEach(u => {
+                            let badgeRole = u.role.toLowerCase() === 'admin' 
+                                ? '<span class="bg-indigo-100 text-indigo-700 text-[10px] font-black px-2 py-0.5 rounded border border-indigo-200">ADMIN</span>' 
+                                : '<span class="bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-0.5 rounded border border-blue-200">CREATOR</span>';
+                            
+                            let badgeStatus = u.status.toLowerCase() === 'aktif' 
+                                ? '<span class="text-emerald-500 font-bold text-xs"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Aktif</span>' 
+                                : '<span class="text-rose-500 font-bold text-xs"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Nonaktif</span>';
+
+                            let html = `
+                            <tr class="hover:bg-slate-50 transition-colors search-row">
+                                <td class="px-6 py-4 font-bold text-slate-800 text-base">@${u.username}</td>
+                                <td class="px-6 py-4"><span class="font-mono text-xs bg-slate-100 px-2 py-1 rounded border border-slate-200">${u.password}</span></td>
+                                <td class="px-6 py-4 text-center">${badgeRole}</td>
+                                <td class="px-6 py-4 text-center">${badgeStatus}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex justify-center gap-2">
+                                        <button onclick="bukaModalEdit('${u.username}', '${u.role}', '${u.status}')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 py-1.5 px-3 rounded text-xs font-bold transition active:scale-95" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                                        <button onclick="hapusUser('${u.username}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 py-1.5 px-3 rounded text-xs font-bold transition active:scale-95" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>`;
+                            tbUsers.innerHTML += html;
+                        });
+                    } else {
+                        tbUsers.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400">Belum ada user terdaftar.</td></tr>';
+                    }
+                });
+        }
+
+        // SIMPAN TAMBAH USER
+        document.getElementById('formTambah').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSimpan');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+            btn.disabled = true;
+
+            const params = new URLSearchParams();
+            params.append('action', 'tambah_user');
+            params.append('username', document.getElementById('inputUsername').value);
+            params.append('password', document.getElementById('inputPassword').value);
+            params.append('role', document.getElementById('inputRole').value);
+            params.append('status', document.getElementById('inputStatus').value);
+
+            fetch(API_URL, { method: 'POST', body: params })
+                .then(res => res.json())
+                .then(data => {
+                    btn.innerHTML = 'SIMPAN USER';
+                    btn.disabled = false;
+                    if(data.status === 'success') {
+                        toggleModalTambah();
+                        document.getElementById('formTambah').reset();
+                        loadUsers(); // Auto refresh
+                    } else {
+                        alert("❌ Gagal: " + data.message);
+                    }
+                });
+        });
+
+        // SIMPAN EDIT USER
+        document.getElementById('formEdit').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnUpdate');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengupdate...';
+            btn.disabled = true;
+
+            const params = new URLSearchParams();
+            params.append('action', 'edit_user');
+            params.append('old_username', document.getElementById('editOldUsername').value);
+            params.append('new_username', document.getElementById('editUsername').value);
+            params.append('password', document.getElementById('editPassword').value); // Kalo kosong script API bakal ngabaikin
+            params.append('role', document.getElementById('editRole').value);
+            params.append('status', document.getElementById('editStatus').value);
+
+            fetch(API_URL, { method: 'POST', body: params })
+                .then(res => res.json())
+                .then(data => {
+                    btn.innerHTML = 'UPDATE USER';
+                    btn.disabled = false;
+                    if(data.status === 'success') {
+                        tutupModalEdit();
+                        document.getElementById('formEdit').reset();
+                        loadUsers(); // Auto refresh
+                    } else {
+                        alert("❌ Gagal: " + data.message);
+                    }
+                })
+                .catch(err => {
+                    btn.innerHTML = 'UPDATE USER';
+                    btn.disabled = false;
+                    alert("Kesalahan jaringan!");
+                });
+        });
+
+        // LOGIKA PENCARIAN (LIVE SEARCH)
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const keyword = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.search-row');
+            
+            rows.forEach(row => {
+                const textData = row.innerText.toLowerCase();
+                if(textData.includes(keyword)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        window.onload = loadUsers;
+    </script>
+</body>
+</html>
