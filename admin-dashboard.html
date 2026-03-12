@@ -6,10 +6,11 @@
     <title>Admin Dashboard - YT Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-slate-100 font-sans antialiased text-slate-800 flex h-screen overflow-hidden">
+<body class="bg-slate-50 font-sans antialiased text-slate-800 flex h-screen overflow-hidden">
 
-    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden"></div>
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
 
     <aside id="sidebar" class="w-64 bg-slate-900 text-white flex flex-col fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-300 ease-in-out z-50 h-full shadow-2xl md:shadow-none">
         <div class="p-6 flex items-center justify-between border-b border-slate-700">
@@ -24,17 +25,18 @@
             <a href="admin-dashboard.html" class="flex items-center p-3 bg-blue-600 rounded-lg text-white font-medium shadow-md">
                 <i class="fa-solid fa-chart-pie w-6"></i> Dashboard Admin
             </a>
-            
             <a href="assign-task.html" class="flex items-center p-3 hover:bg-slate-800 rounded-lg transition-colors text-slate-300 hover:text-white relative">
                 <i class="fa-solid fa-list-check w-6"></i> Manajemen Quest
                 <span id="notifReviewBadge" class="hidden absolute top-2.5 right-3 w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-lg animate-pulse border border-rose-400"><i class="fa-solid fa-exclamation"></i></span>
             </a>
-            
             <a href="channels.html" class="flex items-center p-3 hover:bg-slate-800 rounded-lg transition-colors text-slate-300 hover:text-white">
                 <i class="fa-brands fa-youtube w-6"></i> Database Channel
             </a>
             <a href="regis-youtube.html" class="flex items-center p-3 hover:bg-slate-800 rounded-lg transition-colors text-slate-300 hover:text-white">
                 <i class="fa-solid fa-user-plus w-6"></i> Regis Speedrun
+            </a>
+            <a href="manage-notes.html" class="flex items-center p-3 hover:bg-slate-800 rounded-lg transition-colors text-slate-300 hover:text-white">
+                <i class="fa-solid fa-bullhorn w-6"></i> Pengumuman Info
             </a>
             <a href="users.html" class="flex items-center p-3 hover:bg-slate-800 rounded-lg transition-colors text-slate-300 hover:text-white">
                 <i class="fa-solid fa-users-gear w-6"></i> Manajemen Tim
@@ -70,16 +72,22 @@
             </button>
         </header>
 
-        <div class="p-4 md:p-8 flex-1 w-full max-w-6xl mx-auto">
-            <div class="mb-8">
-                <h2 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Welcome Back, Bos! 🔥</h2>
-                <p class="text-slate-500 text-sm mt-1">Pantau progress grinding tim lu hari ini secara Live.</p>
+        <div class="p-4 md:p-8 flex-1 w-full max-w-7xl mx-auto pb-20 md:pb-8">
+            <div class="mb-8 flex justify-between items-end">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Executive Dashboard 🔥</h2>
+                    <p class="text-slate-500 text-sm mt-1">Pantau progress grinding tim lu hari ini secara Live.</p>
+                </div>
+                <button onclick="refreshData()" class="hidden md:flex text-slate-500 hover:text-blue-600 font-bold text-sm bg-white border border-slate-200 px-4 py-2 rounded-lg shadow-sm transition active:scale-95 items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Sinkronisasi
+                </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8 items-stretch">
                 
-                <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 border-l-4 border-l-blue-500">
-                    <div class="flex justify-between items-start">
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 border-l-4 border-l-blue-500 relative overflow-hidden group flex flex-col justify-center">
+                    <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-calendar-check text-9xl"></i></div>
+                    <div class="flex justify-between items-start relative z-10">
                         <div>
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Regis Hari Ini</p>
                             <h3 class="text-4xl font-black text-slate-800 tracking-tighter" id="statRegisHariIni"><i class="fa-solid fa-circle-notch fa-spin text-lg text-slate-300"></i></h3>
@@ -88,18 +96,20 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 border-l-4 border-l-amber-500">
-                    <div class="flex justify-between items-start">
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 border-l-4 border-l-amber-500 relative overflow-hidden group flex flex-col justify-center">
+                    <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-bolt text-9xl"></i></div>
+                    <div class="flex justify-between items-start relative z-10">
                         <div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Regis Akumulatif</p>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Akumulatif</p>
                             <h3 id="totalRegisAdmin" class="text-4xl font-black text-slate-800 tracking-tighter"><i class="fa-solid fa-circle-notch fa-spin text-lg text-slate-300"></i></h3>
                         </div>
                         <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 text-xl shadow-inner"><i class="fa-solid fa-bolt"></i></div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 border-l-4 border-l-purple-500">
-                    <div class="flex justify-between items-start">
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 border-l-4 border-l-purple-500 relative overflow-hidden group flex flex-col justify-center">
+                    <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-check-double text-9xl"></i></div>
+                    <div class="flex justify-between items-start relative z-10">
                         <div>
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Quest Selesai (Live)</p>
                             <h3 class="text-4xl font-black text-slate-800 tracking-tighter" id="statQuestDone">...</h3>
@@ -107,29 +117,102 @@
                         <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 text-xl"><i class="fa-solid fa-check-double"></i></div>
                     </div>
                 </div>
+
+                <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-200 border-l-4 border-l-rose-500 relative overflow-hidden flex flex-col justify-between group">
+                    <div class="absolute -right-6 -bottom-6 opacity-[0.03] group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-bullseye text-9xl"></i></div>
+                    
+                    <div class="flex justify-between items-start mb-1 relative z-10">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Target Bulanan</p>
+                            <p class="text-[10px] text-slate-400 font-medium" id="teksBulanTarget">Periode...</p>
+                        </div>
+                        <button onclick="setTarget()" class="text-slate-400 hover:text-rose-500 transition-colors" title="Ubah Target"><i class="fa-solid fa-pen"></i></button>
+                    </div>
+                    
+                    <div class="w-full h-20 relative flex justify-center mt-2 mb-1 z-10">
+                        <canvas id="chartSpeedometer"></canvas>
+                        <div class="absolute bottom-0 flex flex-col items-center translate-y-1">
+                            <span id="speedometerText" class="text-2xl font-black text-slate-800 tracking-tighter">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full text-center relative z-10 mt-1">
+                        <p class="text-xs font-bold text-slate-600 bg-slate-50 py-1.5 rounded-lg border border-slate-100">
+                            <span id="currentRegisBulanIni" class="text-rose-500 font-black">0</span> / <span id="targetRegisBulanan">1000</span> Tercapai
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-base font-black text-slate-800"><i class="fa-solid fa-chart-line text-blue-500 mr-2"></i>Tren Registrasi</h3>
+                        <select id="filterTrenRegis" onchange="updateChartRegis()" class="text-[10px] font-bold bg-slate-50 border border-slate-200 text-slate-600 px-2 py-1.5 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer">
+                            <option value="7">7 Hari Terakhir</option>
+                            <option value="30">30 Hari Terakhir</option>
+                            <option value="all">Semua Waktu</option>
+                        </select>
+                    </div>
+                    <div class="w-full h-64 relative">
+                        <canvas id="chartTrenRegis"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-base font-black text-slate-800"><i class="fa-solid fa-heart-pulse text-emerald-500 mr-2"></i>Kesehatan Channel</h3>
+                        <span class="text-[10px] font-bold bg-emerald-50 text-emerald-600 px-2 py-1 rounded">All Database</span>
+                    </div>
+                    <div class="w-full h-64 relative flex justify-center">
+                        <canvas id="chartKesehatanChannel"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-base font-black text-slate-800"><i class="fa-solid fa-list-check text-purple-500 mr-2"></i>Distribusi Status Quest</h3>
+                        <span class="text-[10px] font-bold bg-purple-50 text-purple-600 px-2 py-1 rounded">Live Data</span>
+                    </div>
+                    <div class="w-full h-64 relative flex justify-center">
+                        <canvas id="chartStatusQuest"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-base font-black text-slate-800"><i class="fa-solid fa-tractor text-amber-500 mr-2"></i>Distribusi Topik Farming</h3>
+                        <span class="text-[10px] font-bold bg-amber-50 text-amber-600 px-2 py-1 rounded">Akun Farming</span>
+                    </div>
+                    <div class="w-full h-64 relative">
+                        <canvas id="chartNicheFarming"></canvas>
+                    </div>
+                </div>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 lg:p-8">
                 <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
                     <h3 class="text-lg md:text-xl font-black text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-ranking-star text-amber-500 text-2xl"></i> Roster & Performance
+                        <i class="fa-solid fa-users-viewfinder text-blue-500 text-2xl"></i> Roster & Performance Tim
                     </h3>
-                    <button onclick="refreshData()" class="text-blue-500 hover:text-blue-700 text-sm font-bold"><i class="fa-solid fa-rotate mr-1"></i> Refresh</button>
                 </div>
                 
-                <div id="leaderboardContainer" class="space-y-4">
-                    <div class="text-center py-10 text-slate-400">
+                <div id="leaderboardContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    <div class="col-span-full text-center py-10 text-slate-400">
                         <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i>
                         <p>Mengkalkulasi kinerja tim...</p>
                     </div>
                 </div>
                 
-                <div class="mt-6 pt-5 border-t border-slate-100 text-center md:text-right">
+                <div class="mt-8 pt-5 border-t border-slate-100 text-center md:text-right">
                     <button onclick="pingMembers()" id="btnPing" class="bg-slate-900 hover:bg-rose-600 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-md active:scale-95 text-sm w-full md:w-auto flex justify-center items-center gap-2 md:inline-flex">
                         <i class="fa-solid fa-bullhorn"></i> PING All Members
                     </button>
                 </div>
             </div>
+
         </div>
     </main>
 
@@ -155,41 +238,285 @@
             overlay.classList.toggle('hidden');
         }
 
-        // --- FETCH DATA LIVE (TERMASUK REGIS HARI INI) ---
+        // VARIABEL GLOBAL GRAFIK & DATA
+        let chartRegisInstance = null;
+        let chartChannelInstance = null;
+        let chartQuestInstance = null;
+        let chartNicheInstance = null;
+        let chartSpeedometerInstance = null;
+        
+        let globalHistoryData = []; // Simpan data history buat filter
+        let monthlyTarget = localStorage.getItem('yt_target_bulanan') || 1000; // Target default
+
+        // --- FETCH DATA LIVE ---
         async function refreshData() {
             try {
                 const cacheBuster = new Date().getTime();
                 
-                // 1. Ambil Total Regis (Sekarang ngambil 'today_total' juga)
-                const regisRes = await fetch(API_URL + '?action=get_total_regis&t=' + cacheBuster);
-                const regisData = await regisRes.json();
+                const [resRegisTotal, resRegisHist, resQuest, resChannel] = await Promise.all([
+                    fetch(API_URL + '?action=get_total_regis&t=' + cacheBuster).then(r => r.json()),
+                    fetch(API_URL + '?action=get_regis_history&t=' + cacheBuster).then(r => r.json()),
+                    fetch(API_URL + '?action=get_quest&t=' + cacheBuster).then(r => r.json()),
+                    fetch(API_URL + '?action=get_channels&t=' + cacheBuster).then(r => r.json())
+                ]);
                 
-                if (regisData.status === 'success') {
-                    document.getElementById('totalRegisAdmin').innerText = regisData.total.toLocaleString();
-                    document.getElementById('statRegisHariIni').innerText = regisData.today_total.toLocaleString();
+                if (resRegisTotal.status === 'success') {
+                    document.getElementById('totalRegisAdmin').innerText = resRegisTotal.total.toLocaleString();
+                    document.getElementById('statRegisHariIni').innerText = resRegisTotal.today_total.toLocaleString();
                 }
 
-                // 2. Ambil Data Quest
-                const questRes = await fetch(API_URL + '?action=get_quest&t=' + cacheBuster);
-                const questData = await questRes.json();
-                
-                if (questData.status === 'success') {
-                    processLeaderboard(questData.data);
-                    checkNotification(questData.data); 
+                if (resQuest.status === 'success') {
+                    processLeaderboard(resQuest.data);
+                    checkNotification(resQuest.data); 
+                    renderChartQuest(resQuest.data);
                 }
-            } catch (err) {
-                console.error("Gagal ambil data:", err);
+
+                if (resRegisHist.status === 'success') {
+                    globalHistoryData = resRegisHist.data; 
+                    updateChartRegis(); 
+                    renderSpeedometer(); 
+                }
+
+                if (resChannel.status === 'success') {
+                    renderChartChannel(resChannel.utama, resChannel.farming);
+                    renderChartNiche(resChannel.farming);
+                }
+
+            } catch (err) { console.error("Gagal ambil data:", err); }
+        }
+
+        // ==========================================
+        // FUNGSI TREN REGIS
+        // ==========================================
+        function updateChartRegis() {
+            const filterValue = document.getElementById('filterTrenRegis').value;
+            let data = [...globalHistoryData]; 
+            
+            if (filterValue === '7') data = data.slice(0, 7);
+            else if (filterValue === '30') data = data.slice(0, 30);
+            
+            data.reverse(); 
+
+            let labels = data.map(d => String(d.tanggal).substring(0, 6)); 
+            let values = data.map(d => d.regis_hari_ini);
+
+            const ctx = document.getElementById('chartTrenRegis').getContext('2d');
+            if (chartRegisInstance) chartRegisInstance.destroy(); 
+            
+            chartRegisInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Regis',
+                        data: values,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#3b82f6',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.4 
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { borderDash: [5, 5], color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // FUNGSI SPEEDOMETER TARGET (COMPACT)
+        // ==========================================
+        function setTarget() {
+            let newTarget = prompt("Tentukan target jumlah Regis untuk bulan ini (Angka saja):", monthlyTarget);
+            if (newTarget && !isNaN(newTarget)) {
+                monthlyTarget = parseInt(newTarget);
+                localStorage.setItem('yt_target_bulanan', monthlyTarget);
+                renderSpeedometer(); 
             }
         }
 
-        // --- FUNGSI CEK NOTIFIKASI "UNDER REVIEW" ---
-        function checkNotification(quests) {
-            let butuhReview = 0;
-            quests.forEach(q => {
-                if (q.status === 'Under Review') {
-                    butuhReview++;
+        function renderSpeedometer() {
+            const now = new Date();
+            const currentMonth = now.getMonth(); 
+            const currentYear = now.getFullYear(); 
+            const bulanArr = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            
+            const namaBulanIni = bulanArr[currentMonth];
+            document.getElementById('teksBulanTarget').innerText = `Periode: ${namaBulanIni} ${currentYear}`;
+
+            let totalBulanIni = 0;
+            globalHistoryData.forEach(d => {
+                let tglStr = String(d.tanggal).toLowerCase();
+                let teksBulan = namaBulanIni.toLowerCase();
+                if (tglStr.includes(teksBulan) && tglStr.includes(currentYear)) {
+                    totalBulanIni += parseInt(d.regis_hari_ini) || 0;
                 }
             });
+
+            document.getElementById('currentRegisBulanIni').innerText = totalBulanIni.toLocaleString();
+            document.getElementById('targetRegisBulanan').innerText = parseInt(monthlyTarget).toLocaleString();
+
+            let persentase = totalBulanIni > 0 ? Math.round((totalBulanIni / monthlyTarget) * 100) : 0;
+            if (persentase > 100) persentase = 100; 
+            document.getElementById('speedometerText').innerText = persentase + '%';
+
+            let sisaTarget = monthlyTarget - totalBulanIni;
+            if (sisaTarget < 0) sisaTarget = 0;
+
+            const ctx = document.getElementById('chartSpeedometer').getContext('2d');
+            if (chartSpeedometerInstance) chartSpeedometerInstance.destroy();
+
+            chartSpeedometerInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Tercapai', 'Kekurangan'],
+                    datasets: [{
+                        data: [totalBulanIni, sisaTarget],
+                        backgroundColor: ['#f43f5e', '#f1f5f9'], 
+                        borderWidth: 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    rotation: 270, 
+                    circumference: 180, 
+                    cutout: '75%', // Disesuaikan biar cantik di ukuran kecil
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { enabled: true }
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // FUNGSI LAINNYA
+        // ==========================================
+        function renderChartChannel(utama, farming) {
+            let totalAman = 0, totalWarning = 0, totalStrike = 0, totalDeleted = 0;
+            const semuaChannel = [...utama, ...farming];
+
+            semuaChannel.forEach(c => {
+                const s = c.status.toLowerCase();
+                if(s === 'aman') totalAman++;
+                else if(s === 'warning') totalWarning++;
+                else if(s === 'strike') totalStrike++;
+                else if(s === 'deleted') totalDeleted++;
+            });
+
+            const ctx = document.getElementById('chartKesehatanChannel').getContext('2d');
+            if (chartChannelInstance) chartChannelInstance.destroy();
+
+            chartChannelInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Aman', 'Warning', 'Strike', 'Deleted'],
+                    datasets: [{
+                        data: [totalAman, totalWarning, totalStrike, totalDeleted],
+                        backgroundColor: ['#10b981', '#f59e0b', '#f97316', '#f43f5e'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 10 } }
+                    },
+                    cutout: '70%' 
+                }
+            });
+        }
+
+        function renderChartQuest(quests) {
+            let pending = 0, review = 0, selesai = 0, tolak = 0;
+
+            quests.forEach(q => {
+                if(q.status === 'Pending') pending++;
+                else if(q.status === 'Under Review') review++;
+                else if(q.status === 'Selesai') selesai++;
+                else if(q.status === 'Ditolak') tolak++;
+            });
+
+            const ctx = document.getElementById('chartStatusQuest').getContext('2d');
+            if (chartQuestInstance) chartQuestInstance.destroy();
+
+            chartQuestInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Selesai', 'Under Review', 'Pending', 'Revisi/Ditolak'],
+                    datasets: [{
+                        data: [selesai, review, pending, tolak],
+                        backgroundColor: ['#10b981', '#f59e0b', '#94a3b8', '#f43f5e'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 10 } }
+                    }
+                }
+            });
+        }
+
+        function renderChartNiche(farming) {
+            const nicheCount = {};
+            farming.forEach(c => {
+                let n = c.niche.charAt(0).toUpperCase() + c.niche.slice(1).toLowerCase();
+                if(n === '-' || n === '') n = 'Tidak Ada';
+                nicheCount[n] = (nicheCount[n] || 0) + 1;
+            });
+
+            const sortedNiches = Object.entries(nicheCount).sort((a, b) => b[1] - a[1]);
+            const top5 = sortedNiches.slice(0, 5);
+
+            const labels = top5.map(item => item[0]);
+            const data = top5.map(item => item[1]);
+
+            const ctx = document.getElementById('chartNicheFarming').getContext('2d');
+            if (chartNicheInstance) chartNicheInstance.destroy();
+
+            chartNicheInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Jumlah Akun',
+                        data: data,
+                        backgroundColor: '#8b5cf6', 
+                        borderRadius: 6 
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { borderDash: [5, 5], color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function checkNotification(quests) {
+            let butuhReview = 0;
+            quests.forEach(q => { if (q.status === 'Under Review') butuhReview++; });
 
             const badgeSidebar = document.getElementById('notifReviewBadge');
             const badgeMobile = document.getElementById('notifReviewBadgeMobile');
@@ -211,9 +538,7 @@
                 const target = q.target;
                 if (target === 'Semua Tim') return; 
 
-                if (!leaderboard[target]) {
-                    leaderboard[target] = { total: 0, done: 0 };
-                }
+                if (!leaderboard[target]) { leaderboard[target] = { total: 0, done: 0 }; }
                 leaderboard[target].total++;
                 if (q.status === 'Selesai') {
                     leaderboard[target].done++;
@@ -221,7 +546,6 @@
                 }
             });
 
-            // Update Quest Selesai
             document.getElementById('statQuestDone').innerText = totalSelesai;
 
             const container = document.getElementById('leaderboardContainer');
@@ -262,10 +586,7 @@
         }
 
         window.onload = refreshData;
-
-        // Auto Refresh tiap 30 detik
         setInterval(refreshData, 30000); 
     </script>
 </body>
-
 </html>
