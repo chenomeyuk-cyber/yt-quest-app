@@ -116,7 +116,7 @@
                 <h3 class="font-bold text-white text-lg flex items-center gap-2"><i class="fa-solid fa-plus text-blue-400"></i> Tambah Akun</h3>
                 <button onclick="toggleModalTambah()" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <div class="p-6">
+            <div class="p-6 max-h-[80vh] overflow-y-auto">
                 <form id="formTambah" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -142,6 +142,10 @@
                         <label class="block text-xs font-bold text-slate-700 mb-1">Nama / ID Channel</label>
                         <input type="text" id="inputNama" required placeholder="Masukkan nama channel..." class="bg-white border border-slate-200 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5">
                     </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Link URL Channel <span class="text-slate-400 font-normal">(Opsional)</span></label>
+                        <input type="url" id="inputUrl" placeholder="https://youtube.com/..." class="bg-white border border-slate-200 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5">
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Email Login</label>
@@ -164,7 +168,7 @@
                 <h3 class="font-bold text-white text-lg flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-amber-100"></i> Update Akun</h3>
                 <button onclick="tutupModalEdit()" class="text-amber-100 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <div class="p-6">
+            <div class="p-6 max-h-[80vh] overflow-y-auto">
                 <form id="formEdit" class="space-y-4">
                     <input type="hidden" id="editOldNama">
                     <input type="hidden" id="editKategori">
@@ -172,6 +176,10 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Nama / ID Channel</label>
                         <input type="text" id="editNama" required class="bg-white border border-slate-300 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5 font-bold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Link URL Channel</label>
+                        <input type="url" id="editUrl" placeholder="https://youtube.com/..." class="bg-white border border-slate-300 text-sm rounded-lg focus:border-blue-500 block w-full p-2.5">
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div id="editWrapUkuran">
@@ -247,10 +255,12 @@
         function toggleModalFilter() { document.getElementById('modalFilter').classList.toggle('hidden'); }
         function tutupModalEdit() { document.getElementById('modalEdit').classList.add('hidden'); }
         
-        function bukaModalEdit(kategori, idChannel, dataEkstra, statusKeamanan) {
+        // UPDATE BUKA MODAL EDIT BUAT NANGKEP URL
+        function bukaModalEdit(kategori, idChannel, dataEkstra, statusKeamanan, urlChannel) {
             document.getElementById('editOldNama').value = idChannel;
             document.getElementById('editKategori').value = kategori;
             document.getElementById('editNama').value = idChannel;
+            document.getElementById('editUrl').value = urlChannel || ''; // Lempar URL ke input edit
 
             const statusFormatted = statusKeamanan.charAt(0).toUpperCase() + statusKeamanan.slice(1).toLowerCase();
             const statSelect = document.getElementById('editStatus');
@@ -316,9 +326,6 @@
             }
         }
 
-        // ==========================================
-        // REVISI LOGIKA SWITCH TAB BIAR WARNA JELAS
-        // ==========================================
         const tabUtama = document.getElementById('tabUtama');
         const tabFarming = document.getElementById('tabFarming');
         const contentUtama = document.getElementById('contentUtama');
@@ -326,25 +333,17 @@
 
         function switchTab(isFarming) {
             if (isFarming) {
-                // Aktifkan tab Farming (Gelap)
                 tabFarming.classList.add('text-white', 'bg-slate-900', 'shadow');
                 tabFarming.classList.remove('text-slate-500', 'hover:text-slate-800');
-                
-                // Matikan tab Utama (Terang)
                 tabUtama.classList.remove('text-white', 'bg-slate-900', 'shadow');
                 tabUtama.classList.add('text-slate-500', 'hover:text-slate-800');
-                
                 contentFarming.classList.remove('hidden');
                 contentUtama.classList.add('hidden');
             } else {
-                // Aktifkan tab Utama (Gelap)
                 tabUtama.classList.add('text-white', 'bg-slate-900', 'shadow');
                 tabUtama.classList.remove('text-slate-500', 'hover:text-slate-800');
-                
-                // Matikan tab Farming (Terang)
                 tabFarming.classList.remove('text-white', 'bg-slate-900', 'shadow');
                 tabFarming.classList.add('text-slate-500', 'hover:text-slate-800');
-                
                 contentUtama.classList.remove('hidden');
                 contentFarming.classList.add('hidden');
             }
@@ -381,10 +380,15 @@
                     if(data.status === 'success') {
                         if(data.utama.length > 0) {
                             data.utama.forEach(c => {
+                                // LOGIKA NAMA HYPERLINK
+                                let namaChannelHtml = c.url 
+                                    ? `<a href="${c.url}" target="_blank" class="font-bold text-blue-600 hover:text-blue-800 text-base transition-colors flex items-center gap-1.5 w-fit" title="Buka di YouTube">${c.id} <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i></a>`
+                                    : `<p class="font-bold text-slate-900 text-base">${c.id}</p>`;
+
                                 tbUtama.innerHTML += `
                                 <tr class="hover:bg-slate-50 transition-colors search-row" data-status="${c.status.toLowerCase()}">
                                     <td class="px-6 py-4 min-w-[180px]">
-                                        <p class="font-bold text-slate-900 text-base">${c.id}</p>
+                                        ${namaChannelHtml}
                                         <span class="bg-purple-100 text-purple-700 text-[10px] font-black px-2 py-0.5 rounded border border-purple-200 mt-1 inline-block">${c.ukuran.toUpperCase()}</span>
                                     </td>
                                     <td class="px-6 py-4 min-w-[220px]">
@@ -395,7 +399,7 @@
                                     <td class="px-6 py-4 text-center font-bold text-slate-700">${c.pic}</td>
                                     <td class="px-6 py-4 text-center">
                                         <div class="flex justify-center gap-2">
-                                            <button onclick="bukaModalEdit('Utama', '${c.id}', '${c.ukuran}', '${c.status}')" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 py-1.5 px-3 rounded text-xs font-bold transition active:scale-95" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                                            <button onclick="bukaModalEdit('Utama', '${c.id}', '${c.ukuran}', '${c.status}', '${c.url || ''}')" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 py-1.5 px-3 rounded text-xs font-bold transition active:scale-95" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
                                             <button onclick="hapusChannel('Utama', '${c.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 py-1.5 px-3 rounded text-xs font-bold transition active:scale-95" title="Hapus"><i class="fa-solid fa-trash"></i></button>
                                         </div>
                                     </td>
@@ -405,10 +409,15 @@
 
                         if(data.farming.length > 0) {
                             data.farming.forEach(c => {
+                                // LOGIKA NAMA HYPERLINK
+                                let namaChannelHtml = c.url 
+                                    ? `<a href="${c.url}" target="_blank" class="font-bold text-blue-600 hover:text-blue-800 text-base transition-colors flex items-center gap-1.5 w-fit" title="Buka di YouTube">${c.id} <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i></a>`
+                                    : `<p class="font-bold text-slate-900 text-base">${c.id}</p>`;
+
                                 tbFarming.innerHTML += `
                                 <tr class="hover:bg-slate-50 transition-colors search-row" data-status="${c.status.toLowerCase()}">
                                     <td class="px-6 py-4 min-w-[150px]">
-                                        <p class="font-bold text-slate-900 text-base">${c.id}</p>
+                                        ${namaChannelHtml}
                                         <p class="text-xs text-slate-500 mt-0.5"><span class="font-semibold">Niche:</span> ${c.niche}</p>
                                     </td>
                                     <td class="px-6 py-4 min-w-[220px]">
@@ -420,7 +429,7 @@
                                     <td class="px-6 py-4 text-center font-bold text-slate-700">${c.pic}</td>
                                     <td class="px-6 py-4 text-center">
                                         <div class="flex justify-center gap-2">
-                                            <button onclick="bukaModalEdit('Farming', '${c.id}', '${c.niche}', '${c.status}')" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 py-1.5 px-3 rounded text-xs font-bold transition active:scale-95" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                                            <button onclick="bukaModalEdit('Farming', '${c.id}', '${c.niche}', '${c.status}', '${c.url || ''}')" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 py-1.5 px-3 rounded text-xs font-bold transition active:scale-95" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
                                             <button onclick="hapusChannel('Farming', '${c.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 py-1.5 px-3 rounded text-xs font-bold transition active:scale-95" title="Hapus"><i class="fa-solid fa-trash"></i></button>
                                         </div>
                                     </td>
@@ -443,6 +452,7 @@
             params.append('ukuran', document.getElementById('inputUkuran').value);
             params.append('niche', document.getElementById('inputNiche').value.toLowerCase());
             params.append('nama', document.getElementById('inputNama').value);
+            params.append('url_channel', document.getElementById('inputUrl').value); // PARAMETER URL BARU
             params.append('email', document.getElementById('inputEmail').value);
             params.append('password', document.getElementById('inputPassword').value);
             params.append('pic', userName);
@@ -476,6 +486,7 @@
             params.append('ukuran', document.getElementById('editUkuran').value);
             params.append('niche', document.getElementById('editNiche').value.toLowerCase());
             params.append('status', document.getElementById('editStatus').value);
+            params.append('url_channel', document.getElementById('editUrl').value); // PARAMETER URL BARU
             params.append('password', document.getElementById('editPassword').value);
 
             fetch(API_URL, { method: 'POST', body: params })
@@ -542,5 +553,4 @@
         window.onload = loadChannels;
     </script>
 </body>
-
 </html>
